@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>DataJourney - articles</title><link href="https://datajourney.io/" rel="alternate"></link><link href="https://datajourney.io/feeds/articles.atom.xml" rel="self"></link><id>https://datajourney.io/</id><updated>2019-10-23T00:00:00+02:00</updated><entry><title>Le PYTHONPATH</title><link href="https://datajourney.io/le-pythonpath.html" rel="alternate"></link><published>2019-10-23T00:00:00+02:00</published><updated>2019-10-23T00:00:00+02:00</updated><author><name>Benjamin Delmée</name></author><id>tag:datajourney.io,2019-10-23:/le-pythonpath.html</id><summary type="html">&lt;p&gt;Le mécanisme d'import en Python est simple à utiliser, voir même ludique. Mais quand arrive le moment de développer un projet d'envergure, plus rien ne fonctionne. À de nombreuses reprises dans l'histoire de Python ses concepteurs ont choisi de faire différement et le mécanisme d'import ne fait pas exception. Un peu déroutant au départ, tout rentre dans l'ordre une fois qu'on a compris le fonctionnement du PYTHON PATH, clé de voute du système d'import de Python.&lt;/p&gt;</summary><content type="html">&lt;p&gt;Le mécanisme d'import en Python est simple à utiliser, voir même ludique. Mais quand arrive le moment de développer un projet d'envergure, plus rien ne fonctionne. À de nombreuses reprises dans l'histoire de Python ses concepteurs ont choisi de faire différement et le mécanisme d'import ne fait pas exception. Un peu déroutant au départ, tout rentre dans l'ordre une fois qu'on a compris le fonctionnement du PYTHON PATH, clé de voute du système d'import de Python.&lt;/p&gt;
+&lt;p&gt;Tout au long de cet article, nous supposerons l'existance d'un projet &lt;code&gt;demo&lt;/code&gt; organisé de la manière suivante :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;demo/                   &amp;lt;-- répertoire du projet
+├── pckg_A/                 &amp;lt;-- sous-répertoire
+│   ├── apple.py
+│   └── apricot.py
+├── pckg_B/                 &amp;lt;-- sous-répertoire
+│   ├── banana.py
+│   └── blueberries.py
+├── mytest                  &amp;lt;-- sous-répertoire
+│   └── testing.py
+└── main.py
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Un peu de vocabulaire en passant :
+- Les répertoires &lt;code&gt;pckg_A&lt;/code&gt;, &lt;code&gt;pckg_B&lt;/code&gt; et &lt;code&gt;mytest&lt;/code&gt; sont appelés des &lt;strong&gt;packages&lt;/strong&gt;.
+- Les fichiers &lt;code&gt;main.py&lt;/code&gt;, &lt;code&gt;apple.py&lt;/code&gt;, &lt;code&gt;apricot.py&lt;/code&gt;, &lt;code&gt;banana.py&lt;/code&gt;, &lt;code&gt;blueberries.py&lt;/code&gt; et &lt;code&gt;testing.py&lt;/code&gt; sont appelés des &lt;strong&gt;modules&lt;/strong&gt;.&lt;/p&gt;
+&lt;p&gt;Particularité, en Python tous les packages sont des modules mais tous les modules ne sont pas des packages (cf. &lt;a href="https://docs.python.org/3/reference/import.html#packages"&gt;la documentation&lt;/a&gt;). Autrement dit, les packages sont des modules spéciaux. On peut donc importer des packages de la même manière qu'on importe des modules.&lt;/p&gt;
+&lt;h2&gt;Fonctionnement du PYTHON PATH&lt;/h2&gt;
+&lt;p&gt;Lorsque l'instruction &lt;code&gt;import module&lt;/code&gt; est invoquée, l'interpreteur python va :
+1. Rechercher le module &lt;code&gt;module&lt;/code&gt; en explorant une liste prédifinie de répertoires (c'est cette liste qu'on appelle le &lt;strong&gt;PYTHON PATH&lt;/strong&gt;)
+2. Charger le code du module et le mettre à disposition dans une variable du même nom&lt;/p&gt;
+&lt;p&gt;Bien qu'étant la moins complexe des deux, l'étape n°1 est celle qui pose le plus de problèmes aux nouveaux développeurs Python. Détaillons donc son fonctionnement.&lt;/p&gt;
+&lt;p&gt;Commençons par observer le contenu du PYTHON PATH lorsqu'on exécute le fichier &lt;code&gt;demo/main.py&lt;/code&gt; :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="c1"&gt;# demo/main.py&lt;/span&gt;
+&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;sys&lt;/span&gt;
+&lt;span class="k"&gt;print&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;sys&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;path&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;  &lt;span class="c1"&gt;# cette ligne permet d&amp;#39;afficher le PYTHON PATH&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="c1"&gt;# $&amp;gt; python demo/main.py&lt;/span&gt;
+&lt;span class="p"&gt;[&lt;/span&gt;
+    &lt;span class="s1"&gt;&amp;#39;/home/bdelmee/working-directory/demo&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s1"&gt;&amp;#39;/home/bdelmee/miniconda3/lib/python37.zip&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s1"&gt;&amp;#39;/home/bdelmee/miniconda3/lib/python3.7&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s1"&gt;&amp;#39;/home/bdelmee/miniconda3/lib/python3.7/lib-dynload&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s1"&gt;&amp;#39;/home/bdelmee/working-directory/demo/venv/lib/python3.7/site-packages&amp;#39;&lt;/span&gt;
+&lt;span class="p"&gt;]&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;ul&gt;
+&lt;li&gt;La première ligne correspond au répertoire qui contient &lt;strong&gt;le point d'entrée du programme&lt;/strong&gt; (dans cet exemple &lt;code&gt;main.py&lt;/code&gt;).&lt;/li&gt;
+&lt;li&gt;Les trois lignes suivantes correspondent aux répertoires où sont stockés les modules de la librairie standard.&lt;/li&gt;
+&lt;li&gt;La dernière ligne correspond aux sites-packages. C'est ici que sont stockés les modules installés via &lt;code&gt;pip&lt;/code&gt;. A titre d'information, c'est ce répertoir que modifie &lt;code&gt;venv&lt;/code&gt; pour créer des environements virtuels.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Puique le répertoire &lt;code&gt;demo&lt;/code&gt; est inclu dans le PYTHON PAHT, les imports suivants fonctionneront :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="c1"&gt;# demo/main.py&lt;/span&gt;
+&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;pckg_A&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;apple&lt;/span&gt;    &lt;span class="c1"&gt;# pckg_A est un sous-module de demo -&amp;gt; OK&lt;/span&gt;
+&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;pckg_B&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;banana&lt;/span&gt;   &lt;span class="c1"&gt;# pckg_B est un sous-module de demo -&amp;gt; OK&lt;/span&gt;
+&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;mytest&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;testing&lt;/span&gt;  &lt;span class="c1"&gt;# mytest est un sous-module de demo -&amp;gt; OK&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Observons maintenant le contenu de notre PYTHON PATH lorsqu'on exécute le fichier &lt;code&gt;demo/mytest/testing.py&lt;/code&gt; :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="c1"&gt;# demo/mytest/testing.py&lt;/span&gt;
+&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;sys&lt;/span&gt;
+&lt;span class="k"&gt;print&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;sys&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;path&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="c1"&gt;# $&amp;gt; python demo/test/testing.py&lt;/span&gt;
+&lt;span class="p"&gt;[&lt;/span&gt;
+    &lt;span class="s1"&gt;&amp;#39;/home/bdelmee/working-directory/demo/mytest&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s1"&gt;&amp;#39;/home/bdelmee/miniconda3/lib/python37.zip&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s1"&gt;&amp;#39;/home/bdelmee/miniconda3/lib/python3.7&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s1"&gt;&amp;#39;/home/bdelmee/miniconda3/lib/python3.7/lib-dynload&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s1"&gt;&amp;#39;/home/bdelmee/working-directory/demo/venv/lib/python3.7/site-packages&amp;#39;&lt;/span&gt;
+&lt;span class="p"&gt;]&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;ul&gt;
+&lt;li&gt;On remarque que la première ligne a changé. Le point d'entré du programme n'est plus &lt;code&gt;demo/main.py&lt;/code&gt; mais &lt;code&gt;demo/mytest/testing.py&lt;/code&gt;, d'où ce changement dans le PYTHON PATH.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;La conséquence indésirée de ce changement, c'est que les modules présents dans les répertoires &lt;code&gt;demo/pckg_A&lt;/code&gt; et &lt;code&gt;demo/pckg_B&lt;/code&gt; ne sont plus accessibles. Lorsqu'on essaie de les importer :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="c1"&gt;# demo/mytest/testing.py&lt;/span&gt;
+&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;pckg_A&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;apple&lt;/span&gt;    &lt;span class="c1"&gt;# pckg_A n&amp;#39;est pas un sous-module de pckg_C -&amp;gt; Erreur&lt;/span&gt;
+&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;pckg_B&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;banana&lt;/span&gt;   &lt;span class="c1"&gt;# pckg_B n&amp;#39;est pas un sous-module de pckg_C -&amp;gt; Erreur&lt;/span&gt;
+&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;testing&lt;/span&gt;              &lt;span class="c1"&gt;# testing est un sous-module de test -&amp;gt; OK&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Heureusement ce problème n'est pas définitif, voyons maintenant comment importer nos modules &lt;code&gt;pckg_A&lt;/code&gt; et &lt;code&gt;pckg_B&lt;/code&gt; depuis le module &lt;code&gt;mytest&lt;/code&gt;.&lt;/p&gt;
+&lt;h3&gt;Méthode n°1 : Modifier le PYTHON PATH&lt;/h3&gt;
+&lt;p&gt;Une manière de résoudre ce problème d'import est de modifier le PYTHON PATH. En y ajoutant le répertoire &lt;code&gt;demo&lt;/code&gt;, les modules &lt;code&gt;pckg_A&lt;/code&gt; et &lt;code&gt;pckg_B&lt;/code&gt; seront de nouveaux accessibles depuis le module &lt;code&gt;mytest&lt;/code&gt; (et aussi depuis n'importe quel autre emplacement du programme).&lt;/p&gt;
+&lt;p&gt;On peut ajouter des répertoires au PYTHON PATH en modifiant la variable d'environnement &lt;code&gt;$PYTHONPATH&lt;/code&gt;. Dans l'exemple, cela donnerait :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="c1"&gt;# code console&lt;/span&gt;
+&lt;span class="nb"&gt;export&lt;/span&gt; &lt;span class="nv"&gt;PYTHONPATH&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;/home/bdelmee/working-directory/demo&amp;quot;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;L'autre méthode consiste à modifier le PYTHON PATH directement depuis python. Cela a l'avantage de ne pas nécessiter d'intervention côté système. Dans l'exemple, cela donnerait :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="c1"&gt;# demo/mytest/testing.py&lt;/span&gt;
+&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;sys&lt;/span&gt;
+&lt;span class="n"&gt;sys&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;path&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;append&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;/home/bdelmee/working-directory/demo&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;pckg_A&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;apple&lt;/span&gt;  &lt;span class="c1"&gt;# OK&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h3&gt;Méthode n°2 : Utiliser un point d'entrée unique&lt;/h3&gt;
+&lt;p&gt;Une autre méthode consiste à s'assurer que le PYTHON PATH inclut toujours le répertoire &lt;code&gt;demo&lt;/code&gt; en utilisant un script unique comme point d'entrée du programme. En plaçant ce script à la racine du projet, le répertoire racine sera automatiquement placé dans le PYTHON PATH et les sous-modules seront alors accessibles.&lt;/p&gt;
+&lt;h2&gt;À retenir :&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;Vous ne pouvez pas importer un module s'il ne se trouve pas dans l'un des répertoires/sous-répertoires du PYTHON PATH.&lt;/li&gt;
+&lt;li&gt;Le répertoir contenant le script d'entré du programme est automatiquement ajoutée au PYTHON PATH.&lt;/li&gt;
+&lt;li&gt;Il est possible de modifier le PYTHON PAHT via la variable d'environnement &lt;code&gt;$PYTHONPATH&lt;/code&gt; ou directement dans le code Python via &lt;code&gt;sys.path&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;</content><category term="articles"></category></entry><entry><title>Les fonctions de fenêtrage en SQL</title><link href="https://datajourney.io/les-fonctions-de-fenetrage-en-sql.html" rel="alternate"></link><published>2019-10-23T00:00:00+02:00</published><updated>2019-10-23T00:00:00+02:00</updated><author><name>Benjamin Delmée</name></author><id>tag:datajourney.io,2019-10-23:/les-fonctions-de-fenetrage-en-sql.html</id><summary type="html">&lt;p&gt;En SQL, les &lt;em&gt;Window Functions&lt;/em&gt; (fonctions de fenêtrage) sont plus efficaces et plus lisibles que du code équivalent sans window functions. Elles sont aussi simple à comprendre (voir davantage) que l'opérateur &lt;code&gt;GROUP BY&lt;/code&gt; et pourtant elles sont trop peu utilisées. Détaillons leur fonctionnement pour remédier à celà.&lt;/p&gt;</summary><content type="html">&lt;p&gt;En SQL, les &lt;em&gt;Window Functions&lt;/em&gt; (fonctions de fenêtrage) sont plus efficaces et plus lisibles que du code équivalent sans window functions. Elles sont aussi simple à comprendre (voir davantage) que l'opérateur &lt;code&gt;GROUP BY&lt;/code&gt; et pourtant elles sont trop peu utilisées. Détaillons leur fonctionnement pour remédier à celà.&lt;/p&gt;
+&lt;p&gt;À la manière du &lt;code&gt;GROUP BY&lt;/code&gt;, les fonctions fenêtrées effectuent des calculs d'aggrégations sur des paquets de lignes (qu'on appelle &lt;strong&gt;partitions&lt;/strong&gt;). En revanche, une fois le calcul terminé, les lignes ne sont pas aggrégées et le résultat du calcul est ajouté à toutes les lignes de la partition. Le nombre de lignes n'est donc pas modifié et le résultat de la requête contient autant de lignes que la table initiale.&lt;/p&gt;
+&lt;p&gt;Le code et les schémas ci-dessous illustrent la différence entre &lt;code&gt;GROUP BY&lt;/code&gt; et fonctions de fenêtrage.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="k"&gt;SELECT&lt;/span&gt; &lt;span class="n"&gt;product&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="k"&gt;SUM&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;quantity&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="k"&gt;AVG&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;quantity&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="k"&gt;GROUP&lt;/span&gt; &lt;span class="k"&gt;BY&lt;/span&gt; &lt;span class="n"&gt;product&lt;/span&gt;
+&lt;span class="k"&gt;FROM&lt;/span&gt; &lt;span class="k"&gt;table&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;img alt="GROUP BY en SQL" src="https://datajourney.io/images/001_group_by_demo.svg"&gt;&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="k"&gt;SELECT&lt;/span&gt;
+    &lt;span class="n"&gt;product&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="k"&gt;SUM&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;quantity&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="n"&gt;OVER&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;PARTITION&lt;/span&gt; &lt;span class="k"&gt;BY&lt;/span&gt; &lt;span class="n"&gt;product&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;
+    &lt;span class="k"&gt;AVG&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;quantity&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="n"&gt;OVER&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;PARTITION&lt;/span&gt; &lt;span class="k"&gt;BY&lt;/span&gt; &lt;span class="n"&gt;product&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="k"&gt;FROM&lt;/span&gt;
+    &lt;span class="k"&gt;table&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;img alt="Window Functions en SQL" src="https://datajourney.io/images/001_window_function_demo.svg"&gt;&lt;/p&gt;
+&lt;p&gt;Pour se convaincre de l'utilité des fonctions de fenêtrage, voici un code équivalent au code ci-dessus mais qui n'utilise pas les fonctions de fenêtrage.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="k"&gt;SELECT&lt;/span&gt;
+    &lt;span class="n"&gt;A&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;product&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="n"&gt;B&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;sum_quantity&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="n"&gt;B&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;avg_quantity&lt;/span&gt;
+&lt;span class="k"&gt;FROM&lt;/span&gt; &lt;span class="k"&gt;table&lt;/span&gt; &lt;span class="k"&gt;AS&lt;/span&gt; &lt;span class="n"&gt;A&lt;/span&gt;
+&lt;span class="k"&gt;LEFT&lt;/span&gt; &lt;span class="k"&gt;JOIN&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;
+    &lt;span class="k"&gt;SELECT&lt;/span&gt;
+        &lt;span class="n"&gt;product&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+        &lt;span class="k"&gt;SUM&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;quantity&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="k"&gt;AS&lt;/span&gt; &lt;span class="n"&gt;sum_quantity&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+        &lt;span class="k"&gt;AVG&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;quantity&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="k"&gt;AS&lt;/span&gt; &lt;span class="n"&gt;avg_quantity&lt;/span&gt;
+    &lt;span class="k"&gt;FROM&lt;/span&gt; &lt;span class="k"&gt;table&lt;/span&gt;
+    &lt;span class="k"&gt;GROUP&lt;/span&gt; &lt;span class="k"&gt;BY&lt;/span&gt; &lt;span class="n"&gt;product&lt;/span&gt;
+&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="k"&gt;AS&lt;/span&gt; &lt;span class="n"&gt;B&lt;/span&gt; &lt;span class="k"&gt;ON&lt;/span&gt; &lt;span class="n"&gt;A&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;product&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;B&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;product&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;On constate que, même sur des fonctions simples tel que &lt;code&gt;SUM&lt;/code&gt; ou &lt;code&gt;AVG&lt;/code&gt;, la réécriture de la requête avec des fonctions de fenêtrage a permis un gain de lisibilité. Dans d'autres situtations plus complexes (cf. la suite de cet article), les fonctions de fenêtrage deviennent encore plus indispensables.&lt;/p&gt;
+&lt;h2&gt;Syntaxe des Window Functions&lt;/h2&gt;
+&lt;p&gt;&lt;img alt="Syntaxe des window functions" src="https://datajourney.io/images/001_syntaxe_window_function.svg"&gt;&lt;/p&gt;
+&lt;p&gt;Comment utilise-t-on les fonction de fenêtrage ? La clause &lt;code&gt;OVER()&lt;/code&gt; définit la fenêtre sur laquelle la fonction doit s'appliquer. Les arguments optionnels suivants sont acceptés :
+- &lt;code&gt;PARTITION BY&lt;/code&gt; pour définir la méthode de partionnement. Si cette clause n'est pas mentionnée, la table entière est considérée comme l'unique partition.
+- &lt;code&gt;ORDER BY&lt;/code&gt; pour définir l'ordre à l'intérieur d'une partition. Si cette clause n'est pas mentionnée, aucun tri n'est effectué dans la fenêtre.&lt;/p&gt;
+&lt;p&gt;Les fonctions fenêtrées peuvent être de plusieurs natures :
+- Fonctions d'aggrégation (&lt;code&gt;SUM&lt;/code&gt;, &lt;code&gt;MAX&lt;/code&gt;, &lt;code&gt;COUNT&lt;/code&gt;, etc.)
+- Fonctions de rang (&lt;code&gt;RANK&lt;/code&gt;, &lt;code&gt;ROW_NUMBER&lt;/code&gt;, &lt;code&gt;CUME_DIST&lt;/code&gt;, etc.)
+- Fonctions de valeur (&lt;code&gt;FIRST_VALUE&lt;/code&gt;, &lt;code&gt;LAG&lt;/code&gt;, &lt;code&gt;LEAD&lt;/code&gt;, etc.)&lt;/p&gt;
+&lt;p&gt;Voyons quelques exemples pour chaque type de fonction.&lt;/p&gt;
+&lt;h2&gt;Exemple de requêtes&lt;/h2&gt;
+&lt;p&gt;Supposons que notre base de données contienne la table &lt;code&gt;transactions&lt;/code&gt; et que cette table référence l'historique des transactions immobilières dans le monde.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="k"&gt;SELECT&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="k"&gt;FROM&lt;/span&gt; &lt;span class="n"&gt;transactions&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;img alt="Table des transactions" src="https://datajourney.io/images/001_transactions_table.png"&gt;&lt;/p&gt;
+&lt;h3&gt;Fonction d'aggrégation : COUNT()&lt;/h3&gt;
+&lt;p&gt;En plus des fonctions &lt;code&gt;SUM&lt;/code&gt; et &lt;code&gt;AVG&lt;/code&gt; qui ont déjà été présentées, on trouve également la fonction d'aggrégation &lt;code&gt;COUNT&lt;/code&gt;, très utile pour compter le nombre d'éléments dans une partition :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="k"&gt;SELECT&lt;/span&gt;
+    &lt;span class="n"&gt;T&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="k"&gt;COUNT&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="n"&gt;OVER&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;PARTITION&lt;/span&gt; &lt;span class="k"&gt;BY&lt;/span&gt; &lt;span class="n"&gt;city&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="k"&gt;AS&lt;/span&gt; &lt;span class="ss"&gt;&amp;quot;Count of tx per city&amp;quot;&lt;/span&gt;
+&lt;span class="k"&gt;FROM&lt;/span&gt;
+    &lt;span class="n"&gt;transactions&lt;/span&gt; &lt;span class="k"&gt;AS&lt;/span&gt; &lt;span class="n"&gt;T&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h1&gt;TODO: ajouter le order by pour montrer le count cumulé&lt;/h1&gt;
+&lt;p&gt;&lt;img alt="Table des transactions" src="https://datajourney.io/images/001_request_count.png"&gt;&lt;/p&gt;
+&lt;h3&gt;Fonctions de ranking : RANK() et DENSE_RANK()&lt;/h3&gt;
+&lt;p&gt;La fonction &lt;code&gt;RANK&lt;/code&gt; permet créer un préordre (numérotation avec redondance) au sein d'une partition :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="k"&gt;SELECT&lt;/span&gt;
+    &lt;span class="n"&gt;T&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="n"&gt;RANK&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt; &lt;span class="n"&gt;OVER&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;PARTITION&lt;/span&gt; &lt;span class="k"&gt;BY&lt;/span&gt; &lt;span class="n"&gt;city&lt;/span&gt; &lt;span class="k"&gt;ORDER&lt;/span&gt; &lt;span class="k"&gt;BY&lt;/span&gt; &lt;span class="n"&gt;price&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="k"&gt;as&lt;/span&gt; &lt;span class="ss"&gt;&amp;quot;City price ranking&amp;quot;&lt;/span&gt;
+&lt;span class="k"&gt;FROM&lt;/span&gt;
+    &lt;span class="n"&gt;transactions&lt;/span&gt; &lt;span class="k"&gt;AS&lt;/span&gt; &lt;span class="n"&gt;T&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;img alt="Table des transactions" src="https://datajourney.io/images/001_request_rank.png"&gt;&lt;/p&gt;
+&lt;p&gt;À noter que la présence de la clause &lt;code&gt;PARTITION BY&lt;/code&gt; n'est pas obligation. Si on l'omet, la fenêtre s'étendra sur l'ensemble de la table.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="k"&gt;SELECT&lt;/span&gt;
+    &lt;span class="n"&gt;T&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="n"&gt;RANK&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt; &lt;span class="n"&gt;OVER&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;ORDER&lt;/span&gt; &lt;span class="k"&gt;BY&lt;/span&gt; &lt;span class="n"&gt;price&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="k"&gt;as&lt;/span&gt; &lt;span class="ss"&gt;&amp;quot;Global price ranking&amp;quot;&lt;/span&gt;
+&lt;span class="k"&gt;FROM&lt;/span&gt;
+    &lt;span class="n"&gt;transactions&lt;/span&gt; &lt;span class="k"&gt;AS&lt;/span&gt; &lt;span class="n"&gt;T&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;img alt="Table des transactions" src="https://datajourney.io/images/001_request_rank_2.png"&gt;&lt;/p&gt;
+&lt;p&gt;Dans cet exemple, on remarque que deux lignes ont la même valeur "2". Cela s'explique par la colonne &lt;code&gt;price&lt;/code&gt; qui contient deux fois la valeur "1200000".&lt;/p&gt;
+&lt;p&gt;Pour obtenir une numérotation contigue, on utilise la fonction &lt;code&gt;DENSE_RANK&lt;/code&gt; :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="k"&gt;SELECT&lt;/span&gt;
+    &lt;span class="n"&gt;T&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="n"&gt;DENSE_RANK&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt; &lt;span class="n"&gt;OVER&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;ORDER&lt;/span&gt; &lt;span class="k"&gt;BY&lt;/span&gt; &lt;span class="n"&gt;price&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="k"&gt;as&lt;/span&gt; &lt;span class="ss"&gt;&amp;quot;Global price ranking&amp;quot;&lt;/span&gt;
+&lt;span class="k"&gt;FROM&lt;/span&gt;
+    &lt;span class="n"&gt;transactions&lt;/span&gt; &lt;span class="k"&gt;AS&lt;/span&gt; &lt;span class="n"&gt;T&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h1&gt;TODO: corriger cette image avec un dense rank (et pas rank)&lt;/h1&gt;
+&lt;p&gt;&lt;img alt="Table des transactions" src="https://datajourney.io/images/001_request_dense_rank.png"&gt;&lt;/p&gt;
+&lt;h3&gt;Fonctions valeurs : FIRST_VALUE() et LAG()&lt;/h3&gt;
+&lt;p&gt;La fonction &lt;code&gt;FIRST_VALUE&lt;/code&gt; permet de récupérer les valeurs de la première ligne de la fenêtre. Un exemple de cas d'usage : connaître le montant de la première transaction boursière du jour (le "O" de OHLC).&lt;/p&gt;
+&lt;p&gt;Dans cet exemple, on récupère pour chaque ville la rue avec la transaction la plus élevée :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="k"&gt;SELECT&lt;/span&gt;
+    &lt;span class="n"&gt;T&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="n"&gt;FIRST_VALUE&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;street&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="n"&gt;OVER&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;PARTITION&lt;/span&gt; &lt;span class="k"&gt;BY&lt;/span&gt; &lt;span class="n"&gt;city&lt;/span&gt; &lt;span class="k"&gt;ORDER&lt;/span&gt; &lt;span class="k"&gt;by&lt;/span&gt; &lt;span class="n"&gt;city&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="k"&gt;AS&lt;/span&gt; &lt;span class="ss"&gt;&amp;quot;Most expensive street of the city&amp;quot;&lt;/span&gt;
+&lt;span class="k"&gt;FROM&lt;/span&gt;
+    &lt;span class="n"&gt;transactions&lt;/span&gt; &lt;span class="k"&gt;AS&lt;/span&gt; &lt;span class="n"&gt;T&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;img alt="Table des transactions" src="https://datajourney.io/images/001_request_first_value.png"&gt;&lt;/p&gt;
+&lt;p&gt;Une dernière fonction, très utile, permet de récupérer la ligne précédante. Dans cet exemple &lt;code&gt;LAG&lt;/code&gt; est utilisée pour récupérer la date de la transaction précédente :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="k"&gt;SELECT&lt;/span&gt;
+    &lt;span class="n"&gt;T&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="n"&gt;LAG&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;tx_date&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="n"&gt;OVER&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;ORDER&lt;/span&gt; &lt;span class="k"&gt;BY&lt;/span&gt; &lt;span class="n"&gt;tx_date&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="k"&gt;AS&lt;/span&gt; &lt;span class="ss"&gt;&amp;quot;Datetime of previous transaction&amp;quot;&lt;/span&gt;
+&lt;span class="k"&gt;FROM&lt;/span&gt;
+    &lt;span class="n"&gt;transactions&lt;/span&gt; &lt;span class="k"&gt;AS&lt;/span&gt; &lt;span class="n"&gt;T&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;img alt="Table des transactions" src="https://datajourney.io/images/001_request_lag.png"&gt;&lt;/p&gt;
+&lt;h2&gt;À retenir&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;Les fonction de fenêtrage ont un fonctionnement proche de celui du &lt;code&gt;GROUP BY&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Dans beaucoup de situations, elles sont plus performantes et plus lisibles que du code sans fonction de fenêtrage&lt;/li&gt;
+&lt;/ul&gt;</content><category term="articles"></category></entry></feed>

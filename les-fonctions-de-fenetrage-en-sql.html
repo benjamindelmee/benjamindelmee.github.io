@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="fr">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Bungee+Shade|Source+Sans+Pro&display=swap" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <style>
+        body { background-color: #ECE1C5;}
+        .title a {font-family: 'Bungee Shade', cursive; font-size: 1.2em; color: black; text-decoration: none;}
+        .main-content { font-family: 'Source Sans Pro', sans-serif; }
+    </style>
+    
+    <title>Les fonctions de fenêtrage en SQL</title>
+
+<link rel="stylesheet" type="text/css" href="https://datajourney.io/theme/css/pygment.css" />
+<style>
+    .highlight pre { padding: 5px; border-radius: 2px; color: #d0d0d0; }
+    .main-content img { max-width: 100%; height: auto; }
+</style>
+</head>
+<body>
+    
+    <div class="container main-header">
+        <header class="text-center mb-5 mt-5">
+            <h1 class="title"><a href="https://datajourney.io/">Data Journey</a></h1>
+            <p class="lead">#Data #Programmation</p>
+        </header>
+    </div>
+    
+    <div class="container main-content">
+<section>
+    <div class="row">
+        <div class="col"></div>
+        <div class="col-sm-12 col-md-10 col-lg-8">
+            <article>
+                <header>
+                    <h1 class="article-title">Les fonctions de fenêtrage en SQL</h1>
+<p style="color: grey; font-style: italic;">Par Benjamin Delmée le 23.10.2019 </p>                </header>
+                <p>En SQL, les <em>Window Functions</em> (fonctions de fenêtrage) sont plus efficaces et plus lisibles que du code équivalent sans window functions. Elles sont aussi simple à comprendre (voir davantage) que l'opérateur <code>GROUP BY</code> et pourtant elles sont trop peu utilisées. Détaillons leur fonctionnement pour remédier à celà.</p>
+<p>À la manière du <code>GROUP BY</code>, les fonctions fenêtrées effectuent des calculs d'aggrégations sur des paquets de lignes (qu'on appelle <strong>partitions</strong>). En revanche, une fois le calcul terminé, les lignes ne sont pas aggrégées et le résultat du calcul est ajouté à toutes les lignes de la partition. Le nombre de lignes n'est donc pas modifié et le résultat de la requête contient autant de lignes que la table initiale.</p>
+<p>Le code et les schémas ci-dessous illustrent la différence entre <code>GROUP BY</code> et fonctions de fenêtrage.</p>
+<div class="highlight"><pre><span></span><span class="k">SELECT</span> <span class="n">product</span><span class="p">,</span> <span class="k">SUM</span><span class="p">(</span><span class="n">quantity</span><span class="p">),</span> <span class="k">AVG</span><span class="p">(</span><span class="n">quantity</span><span class="p">)</span>
+<span class="k">GROUP</span> <span class="k">BY</span> <span class="n">product</span>
+<span class="k">FROM</span> <span class="k">table</span><span class="p">;</span>
+</pre></div>
+
+
+<p><img alt="GROUP BY en SQL" src="https://datajourney.io/images/001_group_by_demo.svg"></p>
+<div class="highlight"><pre><span></span><span class="k">SELECT</span>
+    <span class="n">product</span><span class="p">,</span>
+    <span class="k">SUM</span><span class="p">(</span><span class="n">quantity</span><span class="p">)</span> <span class="n">OVER</span><span class="p">(</span><span class="n">PARTITION</span> <span class="k">BY</span> <span class="n">product</span><span class="p">),</span>
+    <span class="k">AVG</span><span class="p">(</span><span class="n">quantity</span><span class="p">)</span> <span class="n">OVER</span><span class="p">(</span><span class="n">PARTITION</span> <span class="k">BY</span> <span class="n">product</span><span class="p">)</span>
+<span class="k">FROM</span>
+    <span class="k">table</span><span class="p">;</span>
+</pre></div>
+
+
+<p><img alt="Window Functions en SQL" src="https://datajourney.io/images/001_window_function_demo.svg"></p>
+<p>Pour se convaincre de l'utilité des fonctions de fenêtrage, voici un code équivalent au code ci-dessus mais qui n'utilise pas les fonctions de fenêtrage.</p>
+<div class="highlight"><pre><span></span><span class="k">SELECT</span>
+    <span class="n">A</span><span class="p">.</span><span class="n">product</span><span class="p">,</span>
+    <span class="n">B</span><span class="p">.</span><span class="n">sum_quantity</span><span class="p">,</span>
+    <span class="n">B</span><span class="p">.</span><span class="n">avg_quantity</span>
+<span class="k">FROM</span> <span class="k">table</span> <span class="k">AS</span> <span class="n">A</span>
+<span class="k">LEFT</span> <span class="k">JOIN</span> <span class="p">(</span>
+    <span class="k">SELECT</span>
+        <span class="n">product</span><span class="p">,</span>
+        <span class="k">SUM</span><span class="p">(</span><span class="n">quantity</span><span class="p">)</span> <span class="k">AS</span> <span class="n">sum_quantity</span><span class="p">,</span>
+        <span class="k">AVG</span><span class="p">(</span><span class="n">quantity</span><span class="p">)</span> <span class="k">AS</span> <span class="n">avg_quantity</span>
+    <span class="k">FROM</span> <span class="k">table</span>
+    <span class="k">GROUP</span> <span class="k">BY</span> <span class="n">product</span>
+<span class="p">)</span> <span class="k">AS</span> <span class="n">B</span> <span class="k">ON</span> <span class="n">A</span><span class="p">.</span><span class="n">product</span><span class="o">=</span><span class="n">B</span><span class="p">.</span><span class="n">product</span><span class="p">;</span>
+</pre></div>
+
+
+<p>On constate que, même sur des fonctions simples tel que <code>SUM</code> ou <code>AVG</code>, la réécriture de la requête avec des fonctions de fenêtrage a permis un gain de lisibilité. Dans d'autres situtations plus complexes (cf. la suite de cet article), les fonctions de fenêtrage deviennent encore plus indispensables.</p>
+<h2>Syntaxe des Window Functions</h2>
+<p><img alt="Syntaxe des window functions" src="https://datajourney.io/images/001_syntaxe_window_function.svg"></p>
+<p>Comment utilise-t-on les fonction de fenêtrage ? La clause <code>OVER()</code> définit la fenêtre sur laquelle la fonction doit s'appliquer. Les arguments optionnels suivants sont acceptés :
+- <code>PARTITION BY</code> pour définir la méthode de partionnement. Si cette clause n'est pas mentionnée, la table entière est considérée comme l'unique partition.
+- <code>ORDER BY</code> pour définir l'ordre à l'intérieur d'une partition. Si cette clause n'est pas mentionnée, aucun tri n'est effectué dans la fenêtre.</p>
+<p>Les fonctions fenêtrées peuvent être de plusieurs natures :
+- Fonctions d'aggrégation (<code>SUM</code>, <code>MAX</code>, <code>COUNT</code>, etc.)
+- Fonctions de rang (<code>RANK</code>, <code>ROW_NUMBER</code>, <code>CUME_DIST</code>, etc.)
+- Fonctions de valeur (<code>FIRST_VALUE</code>, <code>LAG</code>, <code>LEAD</code>, etc.)</p>
+<p>Voyons quelques exemples pour chaque type de fonction.</p>
+<h2>Exemple de requêtes</h2>
+<p>Supposons que notre base de données contienne la table <code>transactions</code> et que cette table référence l'historique des transactions immobilières dans le monde.</p>
+<div class="highlight"><pre><span></span><span class="k">SELECT</span> <span class="o">*</span> <span class="k">FROM</span> <span class="n">transactions</span><span class="p">;</span>
+</pre></div>
+
+
+<p><img alt="Table des transactions" src="https://datajourney.io/images/001_transactions_table.png"></p>
+<h3>Fonction d'aggrégation : COUNT()</h3>
+<p>En plus des fonctions <code>SUM</code> et <code>AVG</code> qui ont déjà été présentées, on trouve également la fonction d'aggrégation <code>COUNT</code>, très utile pour compter le nombre d'éléments dans une partition :</p>
+<div class="highlight"><pre><span></span><span class="k">SELECT</span>
+    <span class="n">T</span><span class="p">.</span><span class="o">*</span><span class="p">,</span>
+    <span class="k">COUNT</span><span class="p">(</span><span class="o">*</span><span class="p">)</span> <span class="n">OVER</span> <span class="p">(</span><span class="n">PARTITION</span> <span class="k">BY</span> <span class="n">city</span><span class="p">)</span> <span class="k">AS</span> <span class="ss">&quot;Count of tx per city&quot;</span>
+<span class="k">FROM</span>
+    <span class="n">transactions</span> <span class="k">AS</span> <span class="n">T</span><span class="p">;</span>
+</pre></div>
+
+
+<h1>TODO: ajouter le order by pour montrer le count cumulé</h1>
+<p><img alt="Table des transactions" src="https://datajourney.io/images/001_request_count.png"></p>
+<h3>Fonctions de ranking : RANK() et DENSE_RANK()</h3>
+<p>La fonction <code>RANK</code> permet créer un préordre (numérotation avec redondance) au sein d'une partition :</p>
+<div class="highlight"><pre><span></span><span class="k">SELECT</span>
+    <span class="n">T</span><span class="p">.</span><span class="o">*</span><span class="p">,</span>
+    <span class="n">RANK</span><span class="p">()</span> <span class="n">OVER</span> <span class="p">(</span><span class="n">PARTITION</span> <span class="k">BY</span> <span class="n">city</span> <span class="k">ORDER</span> <span class="k">BY</span> <span class="n">price</span><span class="p">)</span> <span class="k">as</span> <span class="ss">&quot;City price ranking&quot;</span>
+<span class="k">FROM</span>
+    <span class="n">transactions</span> <span class="k">AS</span> <span class="n">T</span><span class="p">;</span>
+</pre></div>
+
+
+<p><img alt="Table des transactions" src="https://datajourney.io/images/001_request_rank.png"></p>
+<p>À noter que la présence de la clause <code>PARTITION BY</code> n'est pas obligation. Si on l'omet, la fenêtre s'étendra sur l'ensemble de la table.</p>
+<div class="highlight"><pre><span></span><span class="k">SELECT</span>
+    <span class="n">T</span><span class="p">.</span><span class="o">*</span><span class="p">,</span>
+    <span class="n">RANK</span><span class="p">()</span> <span class="n">OVER</span> <span class="p">(</span><span class="k">ORDER</span> <span class="k">BY</span> <span class="n">price</span><span class="p">)</span> <span class="k">as</span> <span class="ss">&quot;Global price ranking&quot;</span>
+<span class="k">FROM</span>
+    <span class="n">transactions</span> <span class="k">AS</span> <span class="n">T</span><span class="p">;</span>
+</pre></div>
+
+
+<p><img alt="Table des transactions" src="https://datajourney.io/images/001_request_rank_2.png"></p>
+<p>Dans cet exemple, on remarque que deux lignes ont la même valeur "2". Cela s'explique par la colonne <code>price</code> qui contient deux fois la valeur "1200000".</p>
+<p>Pour obtenir une numérotation contigue, on utilise la fonction <code>DENSE_RANK</code> :</p>
+<div class="highlight"><pre><span></span><span class="k">SELECT</span>
+    <span class="n">T</span><span class="p">.</span><span class="o">*</span><span class="p">,</span>
+    <span class="n">DENSE_RANK</span><span class="p">()</span> <span class="n">OVER</span> <span class="p">(</span><span class="k">ORDER</span> <span class="k">BY</span> <span class="n">price</span><span class="p">)</span> <span class="k">as</span> <span class="ss">&quot;Global price ranking&quot;</span>
+<span class="k">FROM</span>
+    <span class="n">transactions</span> <span class="k">AS</span> <span class="n">T</span><span class="p">;</span>
+</pre></div>
+
+
+<h1>TODO: corriger cette image avec un dense rank (et pas rank)</h1>
+<p><img alt="Table des transactions" src="https://datajourney.io/images/001_request_dense_rank.png"></p>
+<h3>Fonctions valeurs : FIRST_VALUE() et LAG()</h3>
+<p>La fonction <code>FIRST_VALUE</code> permet de récupérer les valeurs de la première ligne de la fenêtre. Un exemple de cas d'usage : connaître le montant de la première transaction boursière du jour (le "O" de OHLC).</p>
+<p>Dans cet exemple, on récupère pour chaque ville la rue avec la transaction la plus élevée :</p>
+<div class="highlight"><pre><span></span><span class="k">SELECT</span>
+    <span class="n">T</span><span class="p">.</span><span class="o">*</span><span class="p">,</span>
+    <span class="n">FIRST_VALUE</span><span class="p">(</span><span class="n">street</span><span class="p">)</span> <span class="n">OVER</span> <span class="p">(</span><span class="n">PARTITION</span> <span class="k">BY</span> <span class="n">city</span> <span class="k">ORDER</span> <span class="k">by</span> <span class="n">city</span><span class="p">)</span> <span class="k">AS</span> <span class="ss">&quot;Most expensive street of the city&quot;</span>
+<span class="k">FROM</span>
+    <span class="n">transactions</span> <span class="k">AS</span> <span class="n">T</span><span class="p">;</span>
+</pre></div>
+
+
+<p><img alt="Table des transactions" src="https://datajourney.io/images/001_request_first_value.png"></p>
+<p>Une dernière fonction, très utile, permet de récupérer la ligne précédante. Dans cet exemple <code>LAG</code> est utilisée pour récupérer la date de la transaction précédente :</p>
+<div class="highlight"><pre><span></span><span class="k">SELECT</span>
+    <span class="n">T</span><span class="p">.</span><span class="o">*</span><span class="p">,</span>
+    <span class="n">LAG</span><span class="p">(</span><span class="n">tx_date</span><span class="p">)</span> <span class="n">OVER</span><span class="p">(</span><span class="k">ORDER</span> <span class="k">BY</span> <span class="n">tx_date</span><span class="p">)</span> <span class="k">AS</span> <span class="ss">&quot;Datetime of previous transaction&quot;</span>
+<span class="k">FROM</span>
+    <span class="n">transactions</span> <span class="k">AS</span> <span class="n">T</span><span class="p">;</span>
+</pre></div>
+
+
+<p><img alt="Table des transactions" src="https://datajourney.io/images/001_request_lag.png"></p>
+<h2>À retenir</h2>
+<ul>
+<li>Les fonction de fenêtrage ont un fonctionnement proche de celui du <code>GROUP BY</code></li>
+<li>Dans beaucoup de situations, elles sont plus performantes et plus lisibles que du code sans fonction de fenêtrage</li>
+</ul>
+            </article>
+        </div>
+        <div class="col"></div>
+    </div>
+</section>
+    </div>
+    
+</body>
+</html>
