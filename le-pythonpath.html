@@ -17,7 +17,7 @@
         .main-content { font-family: 'Source Sans Pro', sans-serif; }
     </style>
     
-    <title>Le PYTHONPATH</title>
+    <title>Le PYTHON PATH</title>
 
 <link rel="stylesheet" type="text/css" href="https://datajourney.io/theme/css/pygment.css" />
 <style>
@@ -42,10 +42,10 @@
         <div class="col-sm-12 col-md-10 col-lg-8">
             <article>
                 <header>
-                    <h1 class="article-title">Le PYTHONPATH</h1>
-<p style="color: grey; font-style: italic;">Par Benjamin Delmée le 23.10.2019 </p>                </header>
-                <p>Le mécanisme d'import en Python est simple à utiliser, voir même ludique. Mais quand arrive le moment de développer un projet d'envergure, plus rien ne fonctionne. À de nombreuses reprises dans l'histoire de Python ses concepteurs ont choisi de faire différement et le mécanisme d'import ne fait pas exception. Un peu déroutant au départ, tout rentre dans l'ordre une fois qu'on a compris le fonctionnement du PYTHON PATH, clé de voute du système d'import de Python.</p>
-<p>Tout au long de cet article, nous supposerons l'existance d'un projet <code>demo</code> organisé de la manière suivante :</p>
+                    <h1 class="article-title">Le PYTHON PATH</h1>
+<p style="color: grey; font-style: italic;">Par Benjamin Delmée le 17.10.2019 </p>                </header>
+                <p>Le mécanisme d'import en Python est simple à utiliser, voire même ludique. Mais quand arrive le moment de développer un projet d'envergure, plus rien ne fonctionne. À de nombreuses reprises dans l'histoire de Python ses concepteurs ont fait des choix techniques différents et le mécanisme d'import ne fait pas exception. Un peu déroutant au départ, tout rentre dans l'ordre une fois qu'on a compris le fonctionnement du PYTHON PATH, clé de voute du système d'import de Python.</p>
+<p>Tout au long de cet article, nous supposerons l'existence d'un projet <code>demo</code> organisé de la manière suivante :</p>
 <div class="highlight"><pre><span></span>demo/                   &lt;-- répertoire du projet
 ├── pckg_A/                 &lt;-- sous-répertoire
 │   ├── apple.py
@@ -59,17 +59,21 @@
 </pre></div>
 
 
-<p>Un peu de vocabulaire en passant :
-- Les répertoires <code>pckg_A</code>, <code>pckg_B</code> et <code>mytest</code> sont appelés des <strong>packages</strong>.
-- Les fichiers <code>main.py</code>, <code>apple.py</code>, <code>apricot.py</code>, <code>banana.py</code>, <code>blueberries.py</code> et <code>testing.py</code> sont appelés des <strong>modules</strong>.</p>
+<p>Un peu de vocabulaire en passant :</p>
+<ul>
+<li>Les répertoires <code>pckg_A</code>, <code>pckg_B</code> et <code>mytest</code> sont appelés des <strong>packages</strong>.</li>
+<li>Les fichiers <code>main.py</code>, <code>apple.py</code>, <code>apricot.py</code>, <code>banana.py</code>, <code>blueberries.py</code> et <code>testing.py</code> sont appelés des <strong>modules</strong>.</li>
+</ul>
 <p>Particularité, en Python tous les packages sont des modules mais tous les modules ne sont pas des packages (cf. <a href="https://docs.python.org/3/reference/import.html#packages">la documentation</a>). Autrement dit, les packages sont des modules spéciaux. On peut donc importer des packages de la même manière qu'on importe des modules.</p>
 <h2>Fonctionnement du PYTHON PATH</h2>
-<p>Lorsque l'instruction <code>import module</code> est invoquée, l'interpreteur python va :
-1. Rechercher le module <code>module</code> en explorant une liste prédifinie de répertoires (c'est cette liste qu'on appelle le <strong>PYTHON PATH</strong>)
-2. Charger le code du module et le mettre à disposition dans une variable du même nom</p>
+<p>Lorsque l'instruction <code>import module</code> est invoquée, l'interpréteur Python va :</p>
+<ol>
+<li>Rechercher le module <code>module</code> en explorant une liste prédéfinie de répertoires (c'est cette liste qu'on appelle le <strong>PYTHON PATH</strong>)</li>
+<li>Charger le code du module et le mettre à disposition dans une variable du même nom</li>
+</ol>
 <p>Bien qu'étant la moins complexe des deux, l'étape n°1 est celle qui pose le plus de problèmes aux nouveaux développeurs Python. Détaillons donc son fonctionnement.</p>
 <p>Commençons par observer le contenu du PYTHON PATH lorsqu'on exécute le fichier <code>demo/main.py</code> :</p>
-<div class="highlight"><pre><span></span><span class="c1"># demo/main.py</span>
+<div class="highlight"><pre><span></span><span class="c1"># $&gt; cat demo/main.py</span>
 <span class="kn">import</span> <span class="nn">sys</span>
 <span class="k">print</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>  <span class="c1"># cette ligne permet d&#39;afficher le PYTHON PATH</span>
 </pre></div>
@@ -87,12 +91,12 @@
 
 
 <ul>
-<li>La première ligne correspond au répertoire qui contient <strong>le point d'entrée du programme</strong> (dans cet exemple <code>main.py</code>).</li>
-<li>Les trois lignes suivantes correspondent aux répertoires où sont stockés les modules de la librairie standard.</li>
-<li>La dernière ligne correspond aux sites-packages. C'est ici que sont stockés les modules installés via <code>pip</code>. A titre d'information, c'est ce répertoir que modifie <code>venv</code> pour créer des environements virtuels.</li>
+<li>La première ligne correspond au répertoire qui contient <strong>le point d'entrée du programme</strong> (dans cet exemple le fichier <code>main.py</code>). Il ne correspond <strong>pas</strong> au répertoire courant (<code>$PWD</code>) du terminal depuis lequel la commande Python est lancée.</li>
+<li>Les trois lignes suivantes correspondent aux répertoires où sont stockés les modules de la librairie standard. On peut voir ici que la librairie installée par miniconda est utilisée à la place de celle fournie par la distribution Linux (sans impact pour le reste des explications).</li>
+<li>La dernière ligne correspond aux sites-packages. C'est ici que sont stockés les modules installés via <code>pip</code>. À titre d'information, c'est ce répertoire que modifie <code>venv</code> pour créer des environnements virtuels.</li>
 </ul>
-<p>Puique le répertoire <code>demo</code> est inclu dans le PYTHON PAHT, les imports suivants fonctionneront :</p>
-<div class="highlight"><pre><span></span><span class="c1"># demo/main.py</span>
+<p>Il est possible d'importer les modules présents dans le répertoir <code>demo</code> puisque ce dernier est inclus dans le PYTHON PATH :</p>
+<div class="highlight"><pre><span></span><span class="c1"># $&gt; cat demo/main.py</span>
 <span class="kn">from</span> <span class="nn">pckg_A</span> <span class="kn">import</span> <span class="n">apple</span>    <span class="c1"># pckg_A est un sous-module de demo -&gt; OK</span>
 <span class="kn">from</span> <span class="nn">pckg_B</span> <span class="kn">import</span> <span class="n">banana</span>   <span class="c1"># pckg_B est un sous-module de demo -&gt; OK</span>
 <span class="kn">from</span> <span class="nn">mytest</span> <span class="kn">import</span> <span class="n">testing</span>  <span class="c1"># mytest est un sous-module de demo -&gt; OK</span>
@@ -100,7 +104,7 @@
 
 
 <p>Observons maintenant le contenu de notre PYTHON PATH lorsqu'on exécute le fichier <code>demo/mytest/testing.py</code> :</p>
-<div class="highlight"><pre><span></span><span class="c1"># demo/mytest/testing.py</span>
+<div class="highlight"><pre><span></span><span class="c1"># $&gt; cat demo/mytest/testing.py</span>
 <span class="kn">import</span> <span class="nn">sys</span>
 <span class="k">print</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
 </pre></div>
@@ -118,27 +122,31 @@
 
 
 <ul>
-<li>On remarque que la première ligne a changé. Le point d'entré du programme n'est plus <code>demo/main.py</code> mais <code>demo/mytest/testing.py</code>, d'où ce changement dans le PYTHON PATH.</li>
+<li>On remarque que la première ligne a changé, le répertoire <code>demo</code> a été remplacé par le répertoire <code>demo/mytest</code>. En effet le point d'entrée du programme n'est plus <code>demo/main.py</code> mais <code>demo/mytest/testing.py</code>, d'où la mise à jour du PYTHON PATH. C'est ce comportement qui déroute le plus les nouveaux développeurs Python. <strong>Le PYTHON PATH dépend (en partie) du point d'entrée du programme.</strong></li>
 </ul>
 <p>La conséquence indésirée de ce changement, c'est que les modules présents dans les répertoires <code>demo/pckg_A</code> et <code>demo/pckg_B</code> ne sont plus accessibles. Lorsqu'on essaie de les importer :</p>
-<div class="highlight"><pre><span></span><span class="c1"># demo/mytest/testing.py</span>
+<div class="highlight"><pre><span></span><span class="c1"># $&gt; cat demo/mytest/testing.py</span>
+<span class="kn">import</span> <span class="nn">testing</span>              <span class="c1"># testing est un sous-module de test -&gt; OK</span>
 <span class="kn">from</span> <span class="nn">pckg_A</span> <span class="kn">import</span> <span class="n">apple</span>    <span class="c1"># pckg_A n&#39;est pas un sous-module de pckg_C -&gt; Erreur</span>
 <span class="kn">from</span> <span class="nn">pckg_B</span> <span class="kn">import</span> <span class="n">banana</span>   <span class="c1"># pckg_B n&#39;est pas un sous-module de pckg_C -&gt; Erreur</span>
-<span class="kn">import</span> <span class="nn">testing</span>              <span class="c1"># testing est un sous-module de test -&gt; OK</span>
 </pre></div>
 
 
-<p>Heureusement ce problème n'est pas définitif, voyons maintenant comment importer nos modules <code>pckg_A</code> et <code>pckg_B</code> depuis le module <code>mytest</code>.</p>
+<div class="highlight"><pre><span></span><span class="c1"># $&gt; python demo/mytest/testing.py</span>
+<span class="ne">ModuleNotFoundError</span><span class="p">:</span> <span class="n">No</span> <span class="n">module</span> <span class="n">named</span> <span class="s1">&#39;pckg_A&#39;</span>
+</pre></div>
+
+
+<p>Heureusement ce problème n'est pas définitif, voyons maintenant comment importer les modules <code>pckg_A</code> et <code>pckg_B</code> depuis le module <code>mytest</code>.</p>
 <h3>Méthode n°1 : Modifier le PYTHON PATH</h3>
-<p>Une manière de résoudre ce problème d'import est de modifier le PYTHON PATH. En y ajoutant le répertoire <code>demo</code>, les modules <code>pckg_A</code> et <code>pckg_B</code> seront de nouveaux accessibles depuis le module <code>mytest</code> (et aussi depuis n'importe quel autre emplacement du programme).</p>
+<p>Une manière de résoudre ce problème d'import est de modifier le PYTHON PATH en ajoutant le répertoire <code>demo</code>. Les modules <code>pckg_A</code> et <code>pckg_B</code> seront de nouveaux accessibles depuis le module <code>mytest</code> (et aussi depuis n'importe quel autre emplacement du programme).</p>
 <p>On peut ajouter des répertoires au PYTHON PATH en modifiant la variable d'environnement <code>$PYTHONPATH</code>. Dans l'exemple, cela donnerait :</p>
-<div class="highlight"><pre><span></span><span class="c1"># code console</span>
-<span class="nb">export</span> <span class="nv">PYTHONPATH</span><span class="o">=</span><span class="s2">&quot;/home/bdelmee/working-directory/demo&quot;</span>
+<div class="highlight"><pre><span></span>$&gt; <span class="nb">export</span> <span class="nv">PYTHONPATH</span><span class="o">=</span><span class="s2">&quot;/home/bdelmee/working-directory/demo&quot;</span>
 </pre></div>
 
 
-<p>L'autre méthode consiste à modifier le PYTHON PATH directement depuis python. Cela a l'avantage de ne pas nécessiter d'intervention côté système. Dans l'exemple, cela donnerait :</p>
-<div class="highlight"><pre><span></span><span class="c1"># demo/mytest/testing.py</span>
+<p>On peut aussi modifier le PYTHON PATH directement depuis python. Cela a l'avantage de ne pas nécessiter d'intervention côté système. Dans l'exemple, cela donnerait :</p>
+<div class="highlight"><pre><span></span><span class="c1"># $&gt; cat demo/mytest/testing.py</span>
 <span class="kn">import</span> <span class="nn">sys</span>
 <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;/home/bdelmee/working-directory/demo&quot;</span><span class="p">)</span>
 
@@ -147,11 +155,11 @@
 
 
 <h3>Méthode n°2 : Utiliser un point d'entrée unique</h3>
-<p>Une autre méthode consiste à s'assurer que le PYTHON PATH inclut toujours le répertoire <code>demo</code> en utilisant un script unique comme point d'entrée du programme. En plaçant ce script à la racine du projet, le répertoire racine sera automatiquement placé dans le PYTHON PATH et les sous-modules seront alors accessibles.</p>
+<p>Une autre méthode consiste à s'assurer que le PYTHON PATH inclut toujours le répertoire <code>demo</code> en utilisant un script unique comme point d'entrée du programme. En plaçant ce script à la racine du projet, le répertoire racine sera automatiquement placé dans le PYTHON PATH et les sous-modules seront alors accessibles. Dans notre exemple, ce rôle pourrait être joué par le fichier <code>main.py</code>.</p>
 <h2>À retenir :</h2>
 <ul>
 <li>Vous ne pouvez pas importer un module s'il ne se trouve pas dans l'un des répertoires/sous-répertoires du PYTHON PATH.</li>
-<li>Le répertoir contenant le script d'entré du programme est automatiquement ajoutée au PYTHON PATH.</li>
+<li>Le répertoire contenant le point d'entrée du programme est automatiquement ajouté au PYTHON PATH.</li>
 <li>Il est possible de modifier le PYTHON PAHT via la variable d'environnement <code>$PYTHONPATH</code> ou directement dans le code Python via <code>sys.path</code></li>
 </ul>
             </article>

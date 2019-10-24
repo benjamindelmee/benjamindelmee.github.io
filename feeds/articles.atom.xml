@@ -1,114 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>DataJourney - articles</title><link href="https://datajourney.io/" rel="alternate"></link><link href="https://datajourney.io/feeds/articles.atom.xml" rel="self"></link><id>https://datajourney.io/</id><updated>2019-10-23T00:00:00+02:00</updated><entry><title>Le PYTHONPATH</title><link href="https://datajourney.io/le-pythonpath.html" rel="alternate"></link><published>2019-10-23T00:00:00+02:00</published><updated>2019-10-23T00:00:00+02:00</updated><author><name>Benjamin Delmée</name></author><id>tag:datajourney.io,2019-10-23:/le-pythonpath.html</id><summary type="html">&lt;p&gt;Le mécanisme d'import en Python est simple à utiliser, voir même ludique. Mais quand arrive le moment de développer un projet d'envergure, plus rien ne fonctionne. À de nombreuses reprises dans l'histoire de Python ses concepteurs ont choisi de faire différement et le mécanisme d'import ne fait pas exception. Un peu déroutant au départ, tout rentre dans l'ordre une fois qu'on a compris le fonctionnement du PYTHON PATH, clé de voute du système d'import de Python.&lt;/p&gt;</summary><content type="html">&lt;p&gt;Le mécanisme d'import en Python est simple à utiliser, voir même ludique. Mais quand arrive le moment de développer un projet d'envergure, plus rien ne fonctionne. À de nombreuses reprises dans l'histoire de Python ses concepteurs ont choisi de faire différement et le mécanisme d'import ne fait pas exception. Un peu déroutant au départ, tout rentre dans l'ordre une fois qu'on a compris le fonctionnement du PYTHON PATH, clé de voute du système d'import de Python.&lt;/p&gt;
-&lt;p&gt;Tout au long de cet article, nous supposerons l'existance d'un projet &lt;code&gt;demo&lt;/code&gt; organisé de la manière suivante :&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;demo/                   &amp;lt;-- répertoire du projet
-├── pckg_A/                 &amp;lt;-- sous-répertoire
-│   ├── apple.py
-│   └── apricot.py
-├── pckg_B/                 &amp;lt;-- sous-répertoire
-│   ├── banana.py
-│   └── blueberries.py
-├── mytest                  &amp;lt;-- sous-répertoire
-│   └── testing.py
-└── main.py
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;p&gt;Un peu de vocabulaire en passant :
-- Les répertoires &lt;code&gt;pckg_A&lt;/code&gt;, &lt;code&gt;pckg_B&lt;/code&gt; et &lt;code&gt;mytest&lt;/code&gt; sont appelés des &lt;strong&gt;packages&lt;/strong&gt;.
-- Les fichiers &lt;code&gt;main.py&lt;/code&gt;, &lt;code&gt;apple.py&lt;/code&gt;, &lt;code&gt;apricot.py&lt;/code&gt;, &lt;code&gt;banana.py&lt;/code&gt;, &lt;code&gt;blueberries.py&lt;/code&gt; et &lt;code&gt;testing.py&lt;/code&gt; sont appelés des &lt;strong&gt;modules&lt;/strong&gt;.&lt;/p&gt;
-&lt;p&gt;Particularité, en Python tous les packages sont des modules mais tous les modules ne sont pas des packages (cf. &lt;a href="https://docs.python.org/3/reference/import.html#packages"&gt;la documentation&lt;/a&gt;). Autrement dit, les packages sont des modules spéciaux. On peut donc importer des packages de la même manière qu'on importe des modules.&lt;/p&gt;
-&lt;h2&gt;Fonctionnement du PYTHON PATH&lt;/h2&gt;
-&lt;p&gt;Lorsque l'instruction &lt;code&gt;import module&lt;/code&gt; est invoquée, l'interpreteur python va :
-1. Rechercher le module &lt;code&gt;module&lt;/code&gt; en explorant une liste prédifinie de répertoires (c'est cette liste qu'on appelle le &lt;strong&gt;PYTHON PATH&lt;/strong&gt;)
-2. Charger le code du module et le mettre à disposition dans une variable du même nom&lt;/p&gt;
-&lt;p&gt;Bien qu'étant la moins complexe des deux, l'étape n°1 est celle qui pose le plus de problèmes aux nouveaux développeurs Python. Détaillons donc son fonctionnement.&lt;/p&gt;
-&lt;p&gt;Commençons par observer le contenu du PYTHON PATH lorsqu'on exécute le fichier &lt;code&gt;demo/main.py&lt;/code&gt; :&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="c1"&gt;# demo/main.py&lt;/span&gt;
-&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;sys&lt;/span&gt;
-&lt;span class="k"&gt;print&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;sys&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;path&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;  &lt;span class="c1"&gt;# cette ligne permet d&amp;#39;afficher le PYTHON PATH&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="c1"&gt;# $&amp;gt; python demo/main.py&lt;/span&gt;
-&lt;span class="p"&gt;[&lt;/span&gt;
-    &lt;span class="s1"&gt;&amp;#39;/home/bdelmee/working-directory/demo&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
-    &lt;span class="s1"&gt;&amp;#39;/home/bdelmee/miniconda3/lib/python37.zip&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
-    &lt;span class="s1"&gt;&amp;#39;/home/bdelmee/miniconda3/lib/python3.7&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
-    &lt;span class="s1"&gt;&amp;#39;/home/bdelmee/miniconda3/lib/python3.7/lib-dynload&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
-    &lt;span class="s1"&gt;&amp;#39;/home/bdelmee/working-directory/demo/venv/lib/python3.7/site-packages&amp;#39;&lt;/span&gt;
-&lt;span class="p"&gt;]&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;ul&gt;
-&lt;li&gt;La première ligne correspond au répertoire qui contient &lt;strong&gt;le point d'entrée du programme&lt;/strong&gt; (dans cet exemple &lt;code&gt;main.py&lt;/code&gt;).&lt;/li&gt;
-&lt;li&gt;Les trois lignes suivantes correspondent aux répertoires où sont stockés les modules de la librairie standard.&lt;/li&gt;
-&lt;li&gt;La dernière ligne correspond aux sites-packages. C'est ici que sont stockés les modules installés via &lt;code&gt;pip&lt;/code&gt;. A titre d'information, c'est ce répertoir que modifie &lt;code&gt;venv&lt;/code&gt; pour créer des environements virtuels.&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;Puique le répertoire &lt;code&gt;demo&lt;/code&gt; est inclu dans le PYTHON PAHT, les imports suivants fonctionneront :&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="c1"&gt;# demo/main.py&lt;/span&gt;
-&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;pckg_A&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;apple&lt;/span&gt;    &lt;span class="c1"&gt;# pckg_A est un sous-module de demo -&amp;gt; OK&lt;/span&gt;
-&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;pckg_B&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;banana&lt;/span&gt;   &lt;span class="c1"&gt;# pckg_B est un sous-module de demo -&amp;gt; OK&lt;/span&gt;
-&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;mytest&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;testing&lt;/span&gt;  &lt;span class="c1"&gt;# mytest est un sous-module de demo -&amp;gt; OK&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;p&gt;Observons maintenant le contenu de notre PYTHON PATH lorsqu'on exécute le fichier &lt;code&gt;demo/mytest/testing.py&lt;/code&gt; :&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="c1"&gt;# demo/mytest/testing.py&lt;/span&gt;
-&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;sys&lt;/span&gt;
-&lt;span class="k"&gt;print&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;sys&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;path&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="c1"&gt;# $&amp;gt; python demo/test/testing.py&lt;/span&gt;
-&lt;span class="p"&gt;[&lt;/span&gt;
-    &lt;span class="s1"&gt;&amp;#39;/home/bdelmee/working-directory/demo/mytest&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
-    &lt;span class="s1"&gt;&amp;#39;/home/bdelmee/miniconda3/lib/python37.zip&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
-    &lt;span class="s1"&gt;&amp;#39;/home/bdelmee/miniconda3/lib/python3.7&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
-    &lt;span class="s1"&gt;&amp;#39;/home/bdelmee/miniconda3/lib/python3.7/lib-dynload&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
-    &lt;span class="s1"&gt;&amp;#39;/home/bdelmee/working-directory/demo/venv/lib/python3.7/site-packages&amp;#39;&lt;/span&gt;
-&lt;span class="p"&gt;]&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;ul&gt;
-&lt;li&gt;On remarque que la première ligne a changé. Le point d'entré du programme n'est plus &lt;code&gt;demo/main.py&lt;/code&gt; mais &lt;code&gt;demo/mytest/testing.py&lt;/code&gt;, d'où ce changement dans le PYTHON PATH.&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;La conséquence indésirée de ce changement, c'est que les modules présents dans les répertoires &lt;code&gt;demo/pckg_A&lt;/code&gt; et &lt;code&gt;demo/pckg_B&lt;/code&gt; ne sont plus accessibles. Lorsqu'on essaie de les importer :&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="c1"&gt;# demo/mytest/testing.py&lt;/span&gt;
-&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;pckg_A&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;apple&lt;/span&gt;    &lt;span class="c1"&gt;# pckg_A n&amp;#39;est pas un sous-module de pckg_C -&amp;gt; Erreur&lt;/span&gt;
-&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;pckg_B&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;banana&lt;/span&gt;   &lt;span class="c1"&gt;# pckg_B n&amp;#39;est pas un sous-module de pckg_C -&amp;gt; Erreur&lt;/span&gt;
-&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;testing&lt;/span&gt;              &lt;span class="c1"&gt;# testing est un sous-module de test -&amp;gt; OK&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;p&gt;Heureusement ce problème n'est pas définitif, voyons maintenant comment importer nos modules &lt;code&gt;pckg_A&lt;/code&gt; et &lt;code&gt;pckg_B&lt;/code&gt; depuis le module &lt;code&gt;mytest&lt;/code&gt;.&lt;/p&gt;
-&lt;h3&gt;Méthode n°1 : Modifier le PYTHON PATH&lt;/h3&gt;
-&lt;p&gt;Une manière de résoudre ce problème d'import est de modifier le PYTHON PATH. En y ajoutant le répertoire &lt;code&gt;demo&lt;/code&gt;, les modules &lt;code&gt;pckg_A&lt;/code&gt; et &lt;code&gt;pckg_B&lt;/code&gt; seront de nouveaux accessibles depuis le module &lt;code&gt;mytest&lt;/code&gt; (et aussi depuis n'importe quel autre emplacement du programme).&lt;/p&gt;
-&lt;p&gt;On peut ajouter des répertoires au PYTHON PATH en modifiant la variable d'environnement &lt;code&gt;$PYTHONPATH&lt;/code&gt;. Dans l'exemple, cela donnerait :&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="c1"&gt;# code console&lt;/span&gt;
-&lt;span class="nb"&gt;export&lt;/span&gt; &lt;span class="nv"&gt;PYTHONPATH&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;/home/bdelmee/working-directory/demo&amp;quot;&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;p&gt;L'autre méthode consiste à modifier le PYTHON PATH directement depuis python. Cela a l'avantage de ne pas nécessiter d'intervention côté système. Dans l'exemple, cela donnerait :&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="c1"&gt;# demo/mytest/testing.py&lt;/span&gt;
-&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;sys&lt;/span&gt;
-&lt;span class="n"&gt;sys&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;path&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;append&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;/home/bdelmee/working-directory/demo&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-
-&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;pckg_A&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;apple&lt;/span&gt;  &lt;span class="c1"&gt;# OK&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;h3&gt;Méthode n°2 : Utiliser un point d'entrée unique&lt;/h3&gt;
-&lt;p&gt;Une autre méthode consiste à s'assurer que le PYTHON PATH inclut toujours le répertoire &lt;code&gt;demo&lt;/code&gt; en utilisant un script unique comme point d'entrée du programme. En plaçant ce script à la racine du projet, le répertoire racine sera automatiquement placé dans le PYTHON PATH et les sous-modules seront alors accessibles.&lt;/p&gt;
-&lt;h2&gt;À retenir :&lt;/h2&gt;
-&lt;ul&gt;
-&lt;li&gt;Vous ne pouvez pas importer un module s'il ne se trouve pas dans l'un des répertoires/sous-répertoires du PYTHON PATH.&lt;/li&gt;
-&lt;li&gt;Le répertoir contenant le script d'entré du programme est automatiquement ajoutée au PYTHON PATH.&lt;/li&gt;
-&lt;li&gt;Il est possible de modifier le PYTHON PAHT via la variable d'environnement &lt;code&gt;$PYTHONPATH&lt;/code&gt; ou directement dans le code Python via &lt;code&gt;sys.path&lt;/code&gt;&lt;/li&gt;
-&lt;/ul&gt;</content><category term="articles"></category></entry><entry><title>Les fonctions de fenêtrage en SQL</title><link href="https://datajourney.io/les-fonctions-de-fenetrage-en-sql.html" rel="alternate"></link><published>2019-10-23T00:00:00+02:00</published><updated>2019-10-23T00:00:00+02:00</updated><author><name>Benjamin Delmée</name></author><id>tag:datajourney.io,2019-10-23:/les-fonctions-de-fenetrage-en-sql.html</id><summary type="html">&lt;p&gt;En SQL, les &lt;em&gt;Window Functions&lt;/em&gt; (fonctions de fenêtrage) sont plus efficaces et plus lisibles que du code équivalent sans window functions. Elles sont aussi simple à comprendre (voir davantage) que l'opérateur &lt;code&gt;GROUP BY&lt;/code&gt; et pourtant elles sont trop peu utilisées. Détaillons leur fonctionnement pour remédier à celà.&lt;/p&gt;</summary><content type="html">&lt;p&gt;En SQL, les &lt;em&gt;Window Functions&lt;/em&gt; (fonctions de fenêtrage) sont plus efficaces et plus lisibles que du code équivalent sans window functions. Elles sont aussi simple à comprendre (voir davantage) que l'opérateur &lt;code&gt;GROUP BY&lt;/code&gt; et pourtant elles sont trop peu utilisées. Détaillons leur fonctionnement pour remédier à celà.&lt;/p&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>DataJourney - articles</title><link href="https://datajourney.io/" rel="alternate"></link><link href="https://datajourney.io/feeds/articles.atom.xml" rel="self"></link><id>https://datajourney.io/</id><updated>2019-10-23T00:00:00+02:00</updated><entry><title>Les fonctions de fenêtrage en SQL</title><link href="https://datajourney.io/les-fonctions-de-fenetrage-en-sql.html" rel="alternate"></link><published>2019-10-23T00:00:00+02:00</published><updated>2019-10-23T00:00:00+02:00</updated><author><name>Benjamin Delmée</name></author><id>tag:datajourney.io,2019-10-23:/les-fonctions-de-fenetrage-en-sql.html</id><summary type="html">&lt;p&gt;En SQL, les &lt;em&gt;Window Functions&lt;/em&gt; (fonctions de fenêtrage) sont plus efficaces et plus lisibles que du code équivalent sans window functions. Elles sont aussi simple à comprendre (voir davantage) que l'opérateur &lt;code&gt;GROUP BY&lt;/code&gt; et pourtant elles sont trop peu utilisées. Détaillons leur fonctionnement pour remédier à celà.&lt;/p&gt;</summary><content type="html">&lt;p&gt;En SQL, les &lt;em&gt;Window Functions&lt;/em&gt; (fonctions de fenêtrage) sont plus efficaces et plus lisibles que du code équivalent sans window functions. Elles sont aussi simple à comprendre (voir davantage) que l'opérateur &lt;code&gt;GROUP BY&lt;/code&gt; et pourtant elles sont trop peu utilisées. Détaillons leur fonctionnement pour remédier à celà.&lt;/p&gt;
 &lt;p&gt;À la manière du &lt;code&gt;GROUP BY&lt;/code&gt;, les fonctions fenêtrées effectuent des calculs d'aggrégations sur des paquets de lignes (qu'on appelle &lt;strong&gt;partitions&lt;/strong&gt;). En revanche, une fois le calcul terminé, les lignes ne sont pas aggrégées et le résultat du calcul est ajouté à toutes les lignes de la partition. Le nombre de lignes n'est donc pas modifié et le résultat de la requête contient autant de lignes que la table initiale.&lt;/p&gt;
 &lt;p&gt;Le code et les schémas ci-dessous illustrent la différence entre &lt;code&gt;GROUP BY&lt;/code&gt; et fonctions de fenêtrage.&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="k"&gt;SELECT&lt;/span&gt; &lt;span class="n"&gt;product&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="k"&gt;SUM&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;quantity&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="k"&gt;AVG&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;quantity&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
@@ -234,4 +125,121 @@
 &lt;ul&gt;
 &lt;li&gt;Les fonction de fenêtrage ont un fonctionnement proche de celui du &lt;code&gt;GROUP BY&lt;/code&gt;&lt;/li&gt;
 &lt;li&gt;Dans beaucoup de situations, elles sont plus performantes et plus lisibles que du code sans fonction de fenêtrage&lt;/li&gt;
+&lt;/ul&gt;</content><category term="articles"></category></entry><entry><title>Le PYTHON PATH</title><link href="https://datajourney.io/le-pythonpath.html" rel="alternate"></link><published>2019-10-17T00:00:00+02:00</published><updated>2019-10-17T00:00:00+02:00</updated><author><name>Benjamin Delmée</name></author><id>tag:datajourney.io,2019-10-17:/le-pythonpath.html</id><summary type="html">&lt;p&gt;Le mécanisme d'import en Python est simple à utiliser, voire même ludique. Mais quand arrive le moment de développer un projet d'envergure, plus rien ne fonctionne. À de nombreuses reprises dans l'histoire de Python ses concepteurs ont fait des choix techniques différents et le mécanisme d'import ne fait pas exception. Un peu déroutant au départ, tout rentre dans l'ordre une fois qu'on a compris le fonctionnement du PYTHON PATH, clé de voute du système d'import de Python.&lt;/p&gt;</summary><content type="html">&lt;p&gt;Le mécanisme d'import en Python est simple à utiliser, voire même ludique. Mais quand arrive le moment de développer un projet d'envergure, plus rien ne fonctionne. À de nombreuses reprises dans l'histoire de Python ses concepteurs ont fait des choix techniques différents et le mécanisme d'import ne fait pas exception. Un peu déroutant au départ, tout rentre dans l'ordre une fois qu'on a compris le fonctionnement du PYTHON PATH, clé de voute du système d'import de Python.&lt;/p&gt;
+&lt;p&gt;Tout au long de cet article, nous supposerons l'existence d'un projet &lt;code&gt;demo&lt;/code&gt; organisé de la manière suivante :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;demo/                   &amp;lt;-- répertoire du projet
+├── pckg_A/                 &amp;lt;-- sous-répertoire
+│   ├── apple.py
+│   └── apricot.py
+├── pckg_B/                 &amp;lt;-- sous-répertoire
+│   ├── banana.py
+│   └── blueberries.py
+├── mytest                  &amp;lt;-- sous-répertoire
+│   └── testing.py
+└── main.py
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Un peu de vocabulaire en passant :&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Les répertoires &lt;code&gt;pckg_A&lt;/code&gt;, &lt;code&gt;pckg_B&lt;/code&gt; et &lt;code&gt;mytest&lt;/code&gt; sont appelés des &lt;strong&gt;packages&lt;/strong&gt;.&lt;/li&gt;
+&lt;li&gt;Les fichiers &lt;code&gt;main.py&lt;/code&gt;, &lt;code&gt;apple.py&lt;/code&gt;, &lt;code&gt;apricot.py&lt;/code&gt;, &lt;code&gt;banana.py&lt;/code&gt;, &lt;code&gt;blueberries.py&lt;/code&gt; et &lt;code&gt;testing.py&lt;/code&gt; sont appelés des &lt;strong&gt;modules&lt;/strong&gt;.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Particularité, en Python tous les packages sont des modules mais tous les modules ne sont pas des packages (cf. &lt;a href="https://docs.python.org/3/reference/import.html#packages"&gt;la documentation&lt;/a&gt;). Autrement dit, les packages sont des modules spéciaux. On peut donc importer des packages de la même manière qu'on importe des modules.&lt;/p&gt;
+&lt;h2&gt;Fonctionnement du PYTHON PATH&lt;/h2&gt;
+&lt;p&gt;Lorsque l'instruction &lt;code&gt;import module&lt;/code&gt; est invoquée, l'interpréteur Python va :&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Rechercher le module &lt;code&gt;module&lt;/code&gt; en explorant une liste prédéfinie de répertoires (c'est cette liste qu'on appelle le &lt;strong&gt;PYTHON PATH&lt;/strong&gt;)&lt;/li&gt;
+&lt;li&gt;Charger le code du module et le mettre à disposition dans une variable du même nom&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Bien qu'étant la moins complexe des deux, l'étape n°1 est celle qui pose le plus de problèmes aux nouveaux développeurs Python. Détaillons donc son fonctionnement.&lt;/p&gt;
+&lt;p&gt;Commençons par observer le contenu du PYTHON PATH lorsqu'on exécute le fichier &lt;code&gt;demo/main.py&lt;/code&gt; :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="c1"&gt;# $&amp;gt; cat demo/main.py&lt;/span&gt;
+&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;sys&lt;/span&gt;
+&lt;span class="k"&gt;print&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;sys&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;path&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;  &lt;span class="c1"&gt;# cette ligne permet d&amp;#39;afficher le PYTHON PATH&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="c1"&gt;# $&amp;gt; python demo/main.py&lt;/span&gt;
+&lt;span class="p"&gt;[&lt;/span&gt;
+    &lt;span class="s1"&gt;&amp;#39;/home/bdelmee/working-directory/demo&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s1"&gt;&amp;#39;/home/bdelmee/miniconda3/lib/python37.zip&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s1"&gt;&amp;#39;/home/bdelmee/miniconda3/lib/python3.7&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s1"&gt;&amp;#39;/home/bdelmee/miniconda3/lib/python3.7/lib-dynload&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s1"&gt;&amp;#39;/home/bdelmee/working-directory/demo/venv/lib/python3.7/site-packages&amp;#39;&lt;/span&gt;
+&lt;span class="p"&gt;]&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;ul&gt;
+&lt;li&gt;La première ligne correspond au répertoire qui contient &lt;strong&gt;le point d'entrée du programme&lt;/strong&gt; (dans cet exemple le fichier &lt;code&gt;main.py&lt;/code&gt;). Il ne correspond &lt;strong&gt;pas&lt;/strong&gt; au répertoire courant (&lt;code&gt;$PWD&lt;/code&gt;) du terminal depuis lequel la commande Python est lancée.&lt;/li&gt;
+&lt;li&gt;Les trois lignes suivantes correspondent aux répertoires où sont stockés les modules de la librairie standard. On peut voir ici que la librairie installée par miniconda est utilisée à la place de celle fournie par la distribution Linux (sans impact pour le reste des explications).&lt;/li&gt;
+&lt;li&gt;La dernière ligne correspond aux sites-packages. C'est ici que sont stockés les modules installés via &lt;code&gt;pip&lt;/code&gt;. À titre d'information, c'est ce répertoire que modifie &lt;code&gt;venv&lt;/code&gt; pour créer des environnements virtuels.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Il est possible d'importer les modules présents dans le répertoir &lt;code&gt;demo&lt;/code&gt; puisque ce dernier est inclus dans le PYTHON PATH :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="c1"&gt;# $&amp;gt; cat demo/main.py&lt;/span&gt;
+&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;pckg_A&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;apple&lt;/span&gt;    &lt;span class="c1"&gt;# pckg_A est un sous-module de demo -&amp;gt; OK&lt;/span&gt;
+&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;pckg_B&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;banana&lt;/span&gt;   &lt;span class="c1"&gt;# pckg_B est un sous-module de demo -&amp;gt; OK&lt;/span&gt;
+&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;mytest&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;testing&lt;/span&gt;  &lt;span class="c1"&gt;# mytest est un sous-module de demo -&amp;gt; OK&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Observons maintenant le contenu de notre PYTHON PATH lorsqu'on exécute le fichier &lt;code&gt;demo/mytest/testing.py&lt;/code&gt; :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="c1"&gt;# $&amp;gt; cat demo/mytest/testing.py&lt;/span&gt;
+&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;sys&lt;/span&gt;
+&lt;span class="k"&gt;print&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;sys&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;path&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="c1"&gt;# $&amp;gt; python demo/test/testing.py&lt;/span&gt;
+&lt;span class="p"&gt;[&lt;/span&gt;
+    &lt;span class="s1"&gt;&amp;#39;/home/bdelmee/working-directory/demo/mytest&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s1"&gt;&amp;#39;/home/bdelmee/miniconda3/lib/python37.zip&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s1"&gt;&amp;#39;/home/bdelmee/miniconda3/lib/python3.7&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s1"&gt;&amp;#39;/home/bdelmee/miniconda3/lib/python3.7/lib-dynload&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s1"&gt;&amp;#39;/home/bdelmee/working-directory/demo/venv/lib/python3.7/site-packages&amp;#39;&lt;/span&gt;
+&lt;span class="p"&gt;]&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;ul&gt;
+&lt;li&gt;On remarque que la première ligne a changé, le répertoire &lt;code&gt;demo&lt;/code&gt; a été remplacé par le répertoire &lt;code&gt;demo/mytest&lt;/code&gt;. En effet le point d'entrée du programme n'est plus &lt;code&gt;demo/main.py&lt;/code&gt; mais &lt;code&gt;demo/mytest/testing.py&lt;/code&gt;, d'où la mise à jour du PYTHON PATH. C'est ce comportement qui déroute le plus les nouveaux développeurs Python. &lt;strong&gt;Le PYTHON PATH dépend (en partie) du point d'entrée du programme.&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;La conséquence indésirée de ce changement, c'est que les modules présents dans les répertoires &lt;code&gt;demo/pckg_A&lt;/code&gt; et &lt;code&gt;demo/pckg_B&lt;/code&gt; ne sont plus accessibles. Lorsqu'on essaie de les importer :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="c1"&gt;# $&amp;gt; cat demo/mytest/testing.py&lt;/span&gt;
+&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;testing&lt;/span&gt;              &lt;span class="c1"&gt;# testing est un sous-module de test -&amp;gt; OK&lt;/span&gt;
+&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;pckg_A&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;apple&lt;/span&gt;    &lt;span class="c1"&gt;# pckg_A n&amp;#39;est pas un sous-module de pckg_C -&amp;gt; Erreur&lt;/span&gt;
+&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;pckg_B&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;banana&lt;/span&gt;   &lt;span class="c1"&gt;# pckg_B n&amp;#39;est pas un sous-module de pckg_C -&amp;gt; Erreur&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="c1"&gt;# $&amp;gt; python demo/mytest/testing.py&lt;/span&gt;
+&lt;span class="ne"&gt;ModuleNotFoundError&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;No&lt;/span&gt; &lt;span class="n"&gt;module&lt;/span&gt; &lt;span class="n"&gt;named&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;pckg_A&amp;#39;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Heureusement ce problème n'est pas définitif, voyons maintenant comment importer les modules &lt;code&gt;pckg_A&lt;/code&gt; et &lt;code&gt;pckg_B&lt;/code&gt; depuis le module &lt;code&gt;mytest&lt;/code&gt;.&lt;/p&gt;
+&lt;h3&gt;Méthode n°1 : Modifier le PYTHON PATH&lt;/h3&gt;
+&lt;p&gt;Une manière de résoudre ce problème d'import est de modifier le PYTHON PATH en ajoutant le répertoire &lt;code&gt;demo&lt;/code&gt;. Les modules &lt;code&gt;pckg_A&lt;/code&gt; et &lt;code&gt;pckg_B&lt;/code&gt; seront de nouveaux accessibles depuis le module &lt;code&gt;mytest&lt;/code&gt; (et aussi depuis n'importe quel autre emplacement du programme).&lt;/p&gt;
+&lt;p&gt;On peut ajouter des répertoires au PYTHON PATH en modifiant la variable d'environnement &lt;code&gt;$PYTHONPATH&lt;/code&gt;. Dans l'exemple, cela donnerait :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$&amp;gt; &lt;span class="nb"&gt;export&lt;/span&gt; &lt;span class="nv"&gt;PYTHONPATH&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;/home/bdelmee/working-directory/demo&amp;quot;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;On peut aussi modifier le PYTHON PATH directement depuis python. Cela a l'avantage de ne pas nécessiter d'intervention côté système. Dans l'exemple, cela donnerait :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="c1"&gt;# $&amp;gt; cat demo/mytest/testing.py&lt;/span&gt;
+&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;sys&lt;/span&gt;
+&lt;span class="n"&gt;sys&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;path&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;append&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;/home/bdelmee/working-directory/demo&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;pckg_A&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;apple&lt;/span&gt;  &lt;span class="c1"&gt;# OK&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h3&gt;Méthode n°2 : Utiliser un point d'entrée unique&lt;/h3&gt;
+&lt;p&gt;Une autre méthode consiste à s'assurer que le PYTHON PATH inclut toujours le répertoire &lt;code&gt;demo&lt;/code&gt; en utilisant un script unique comme point d'entrée du programme. En plaçant ce script à la racine du projet, le répertoire racine sera automatiquement placé dans le PYTHON PATH et les sous-modules seront alors accessibles. Dans notre exemple, ce rôle pourrait être joué par le fichier &lt;code&gt;main.py&lt;/code&gt;.&lt;/p&gt;
+&lt;h2&gt;À retenir :&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;Vous ne pouvez pas importer un module s'il ne se trouve pas dans l'un des répertoires/sous-répertoires du PYTHON PATH.&lt;/li&gt;
+&lt;li&gt;Le répertoire contenant le point d'entrée du programme est automatiquement ajouté au PYTHON PATH.&lt;/li&gt;
+&lt;li&gt;Il est possible de modifier le PYTHON PAHT via la variable d'environnement &lt;code&gt;$PYTHONPATH&lt;/code&gt; ou directement dans le code Python via &lt;code&gt;sys.path&lt;/code&gt;&lt;/li&gt;
 &lt;/ul&gt;</content><category term="articles"></category></entry></feed>
