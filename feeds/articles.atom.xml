@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>DataJourney - articles</title><link href="https://datajourney.io/" rel="alternate"></link><link href="https://datajourney.io/feeds/articles.atom.xml" rel="self"></link><id>https://datajourney.io/</id><updated>2019-10-23T00:00:00+02:00</updated><entry><title>Les fonctions de fenêtrage en SQL</title><link href="https://datajourney.io/les-fonctions-de-fenetrage-en-sql.html" rel="alternate"></link><published>2019-10-23T00:00:00+02:00</published><updated>2019-10-23T00:00:00+02:00</updated><author><name>Benjamin Delmée</name></author><id>tag:datajourney.io,2019-10-23:/les-fonctions-de-fenetrage-en-sql.html</id><summary type="html">&lt;p&gt;En SQL, les &lt;em&gt;Window Functions&lt;/em&gt; (fonctions de fenêtrage) sont plus efficaces et plus lisibles que du code équivalent sans window functions. Elles sont aussi simple à comprendre (voir davantage) que l'opérateur &lt;code&gt;GROUP BY&lt;/code&gt; et pourtant elles sont trop peu utilisées. Détaillons leur fonctionnement pour remédier à celà.&lt;/p&gt;</summary><content type="html">&lt;p&gt;En SQL, les &lt;em&gt;Window Functions&lt;/em&gt; (fonctions de fenêtrage) sont plus efficaces et plus lisibles que du code équivalent sans window functions. Elles sont aussi simple à comprendre (voir davantage) que l'opérateur &lt;code&gt;GROUP BY&lt;/code&gt; et pourtant elles sont trop peu utilisées. Détaillons leur fonctionnement pour remédier à celà.&lt;/p&gt;
-&lt;p&gt;À la manière du &lt;code&gt;GROUP BY&lt;/code&gt;, les fonctions fenêtrées effectuent des calculs d'aggrégations sur des paquets de lignes (qu'on appelle &lt;strong&gt;partitions&lt;/strong&gt;). En revanche, une fois le calcul terminé, les lignes ne sont pas aggrégées et le résultat du calcul est ajouté à toutes les lignes de la partition. Le nombre de lignes n'est donc pas modifié et le résultat de la requête contient autant de lignes que la table initiale.&lt;/p&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>DataJourney - articles</title><link href="https://datajourney.io/" rel="alternate"></link><link href="https://datajourney.io/feeds/articles.atom.xml" rel="self"></link><id>https://datajourney.io/</id><updated>2019-10-23T00:00:00+02:00</updated><entry><title>Les fonctions de fenêtrage en SQL</title><link href="https://datajourney.io/les-fonctions-de-fenetrage-en-sql.html" rel="alternate"></link><published>2019-10-23T00:00:00+02:00</published><updated>2019-10-23T00:00:00+02:00</updated><author><name>Benjamin Delmée</name></author><id>tag:datajourney.io,2019-10-23:/les-fonctions-de-fenetrage-en-sql.html</id><summary type="html">&lt;p&gt;En SQL, les &lt;em&gt;Window Functions&lt;/em&gt; (fonctions de fenêtrage) sont plus efficaces et plus lisibles que du code équivalent sans window functions. Elles sont aussi simples à comprendre (voir davantage) que l'opérateur &lt;code&gt;GROUP BY&lt;/code&gt; mais sont, pourtant, trop peu utilisées. Détaillons leur fonctionnement pour remédier à cela.&lt;/p&gt;</summary><content type="html">&lt;p&gt;En SQL, les &lt;em&gt;Window Functions&lt;/em&gt; (fonctions de fenêtrage) sont plus efficaces et plus lisibles que du code équivalent sans window functions. Elles sont aussi simples à comprendre (voir davantage) que l'opérateur &lt;code&gt;GROUP BY&lt;/code&gt; mais sont, pourtant, trop peu utilisées. Détaillons leur fonctionnement pour remédier à cela.&lt;/p&gt;
+&lt;p&gt;À la manière du &lt;code&gt;GROUP BY&lt;/code&gt;, les fonctions fenêtrées effectuent des calculs d'agrégations sur des paquets de lignes (qu'on appelle &lt;strong&gt;partitions&lt;/strong&gt;). En revanche, une fois le calcul terminé, les lignes ne sont pas agrégées et le résultat du calcul est ajouté à toutes les lignes de la partition. Le nombre de lignes n'est donc pas modifié et le résultat de la requête contient autant de lignes que la table initiale.&lt;/p&gt;
 &lt;p&gt;Le code et les schémas ci-dessous illustrent la différence entre &lt;code&gt;GROUP BY&lt;/code&gt; et fonctions de fenêtrage.&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="k"&gt;SELECT&lt;/span&gt; &lt;span class="n"&gt;product&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="k"&gt;SUM&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;quantity&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="k"&gt;AVG&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;quantity&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 &lt;span class="k"&gt;GROUP&lt;/span&gt; &lt;span class="k"&gt;BY&lt;/span&gt; &lt;span class="n"&gt;product&lt;/span&gt;
@@ -9,6 +9,7 @@
 
 
 &lt;p&gt;&lt;img alt="GROUP BY en SQL" src="https://datajourney.io/images/001_group_by_demo.svg"&gt;&lt;/p&gt;
+&lt;p&gt;Le &lt;code&gt;GROUP BY&lt;/code&gt; a réduit le nombre final de lignes en agrégant les lignes par produit.&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="k"&gt;SELECT&lt;/span&gt;
     &lt;span class="n"&gt;product&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
     &lt;span class="k"&gt;SUM&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;quantity&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="n"&gt;OVER&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;PARTITION&lt;/span&gt; &lt;span class="k"&gt;BY&lt;/span&gt; &lt;span class="n"&gt;product&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;
@@ -19,7 +20,8 @@
 
 
 &lt;p&gt;&lt;img alt="Window Functions en SQL" src="https://datajourney.io/images/001_window_function_demo.svg"&gt;&lt;/p&gt;
-&lt;p&gt;Pour se convaincre de l'utilité des fonctions de fenêtrage, voici un code équivalent au code ci-dessus mais qui n'utilise pas les fonctions de fenêtrage.&lt;/p&gt;
+&lt;p&gt;La fonction de fenêtrage n'a &lt;strong&gt;pas&lt;/strong&gt; réduit le nombre final de lignes. L'information a été dupliquée pour chaque ligne.&lt;/p&gt;
+&lt;p&gt;Un tel résultat peut être obtenu sans les fonctions de fenêtrage. Cependant la requête est plus concise et plus facilement optimisable par le moteur de rêquetes du SGBD. Pour s'en convaincre, voici un code équivalant au code ci-dessus mais qui n'utilise pas les fonctions de fenêtrage.&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="k"&gt;SELECT&lt;/span&gt;
     &lt;span class="n"&gt;A&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;product&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
     &lt;span class="n"&gt;B&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;sum_quantity&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
@@ -36,26 +38,30 @@
 &lt;/pre&gt;&lt;/div&gt;
 
 
-&lt;p&gt;On constate que, même sur des fonctions simples tel que &lt;code&gt;SUM&lt;/code&gt; ou &lt;code&gt;AVG&lt;/code&gt;, la réécriture de la requête avec des fonctions de fenêtrage a permis un gain de lisibilité. Dans d'autres situtations plus complexes (cf. la suite de cet article), les fonctions de fenêtrage deviennent encore plus indispensables.&lt;/p&gt;
+&lt;p&gt;On constate que, même sur des fonctions simples telles que &lt;code&gt;SUM&lt;/code&gt; ou &lt;code&gt;AVG&lt;/code&gt;, la réécriture de la requête avec des fonctions de fenêtrage a permis un gain de lisibilité. Dans d'autres situations plus complexes (cf. la suite de cet article), les fonctions de fenêtrage deviennent encore plus indispensables.&lt;/p&gt;
 &lt;h2&gt;Syntaxe des Window Functions&lt;/h2&gt;
 &lt;p&gt;&lt;img alt="Syntaxe des window functions" src="https://datajourney.io/images/001_syntaxe_window_function.svg"&gt;&lt;/p&gt;
-&lt;p&gt;Comment utilise-t-on les fonction de fenêtrage ? La clause &lt;code&gt;OVER()&lt;/code&gt; définit la fenêtre sur laquelle la fonction doit s'appliquer. Les arguments optionnels suivants sont acceptés :
-- &lt;code&gt;PARTITION BY&lt;/code&gt; pour définir la méthode de partionnement. Si cette clause n'est pas mentionnée, la table entière est considérée comme l'unique partition.
-- &lt;code&gt;ORDER BY&lt;/code&gt; pour définir l'ordre à l'intérieur d'une partition. Si cette clause n'est pas mentionnée, aucun tri n'est effectué dans la fenêtre.&lt;/p&gt;
-&lt;p&gt;Les fonctions fenêtrées peuvent être de plusieurs natures :
-- Fonctions d'aggrégation (&lt;code&gt;SUM&lt;/code&gt;, &lt;code&gt;MAX&lt;/code&gt;, &lt;code&gt;COUNT&lt;/code&gt;, etc.)
-- Fonctions de rang (&lt;code&gt;RANK&lt;/code&gt;, &lt;code&gt;ROW_NUMBER&lt;/code&gt;, &lt;code&gt;CUME_DIST&lt;/code&gt;, etc.)
-- Fonctions de valeur (&lt;code&gt;FIRST_VALUE&lt;/code&gt;, &lt;code&gt;LAG&lt;/code&gt;, &lt;code&gt;LEAD&lt;/code&gt;, etc.)&lt;/p&gt;
+&lt;p&gt;Comment utilise-t-on les fonctions de fenêtrage ? La clause &lt;code&gt;OVER()&lt;/code&gt; définit la fenêtre sur laquelle la fonction doit s'appliquer. Les arguments optionnels suivants sont acceptés :&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;PARTITION BY&lt;/code&gt; pour définir la méthode de partitionnement. Si cette clause n'est pas mentionnée, la table entière est considérée comme unique partition.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;ORDER BY&lt;/code&gt; pour définir l'ordre à l'intérieur d'une partition. Si cette clause n'est pas mentionnée, aucun tri n'est effectué dans la fenêtre.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Les fonctions fenêtrées peuvent être de plusieurs natures. Voici ci-dessous quelques exemples de fonctions pour chaque type. Cette liste n'est pas exhaustive et peut varier d'un SGBD à l'autre. Vous devrez donc vous référencer à la documentation de votre SGBD.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Fonctions d'agrégation (&lt;code&gt;SUM&lt;/code&gt;, &lt;code&gt;MAX&lt;/code&gt;, &lt;code&gt;COUNT&lt;/code&gt;, etc.)&lt;/li&gt;
+&lt;li&gt;Fonctions de rang (&lt;code&gt;RANK&lt;/code&gt;, &lt;code&gt;ROW_NUMBER&lt;/code&gt;, &lt;code&gt;CUME_DIST&lt;/code&gt;, etc.)&lt;/li&gt;
+&lt;li&gt;Fonctions de valeur (&lt;code&gt;FIRST_VALUE&lt;/code&gt;, &lt;code&gt;LAG&lt;/code&gt;, &lt;code&gt;LEAD&lt;/code&gt;, etc.)&lt;/li&gt;
+&lt;/ul&gt;
 &lt;p&gt;Voyons quelques exemples pour chaque type de fonction.&lt;/p&gt;
 &lt;h2&gt;Exemple de requêtes&lt;/h2&gt;
-&lt;p&gt;Supposons que notre base de données contienne la table &lt;code&gt;transactions&lt;/code&gt; et que cette table référence l'historique des transactions immobilières dans le monde.&lt;/p&gt;
+&lt;p&gt;Pour tous les exemples ci-dessous, supposons que notre base de données contienne la table &lt;code&gt;transactions&lt;/code&gt; et que cette table référence l'historique des transactions immobilières dans le monde.&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="k"&gt;SELECT&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="k"&gt;FROM&lt;/span&gt; &lt;span class="n"&gt;transactions&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
 
 &lt;p&gt;&lt;img alt="Table des transactions" src="https://datajourney.io/images/001_transactions_table.png"&gt;&lt;/p&gt;
 &lt;h3&gt;Fonction d'aggrégation : COUNT()&lt;/h3&gt;
-&lt;p&gt;En plus des fonctions &lt;code&gt;SUM&lt;/code&gt; et &lt;code&gt;AVG&lt;/code&gt; qui ont déjà été présentées, on trouve également la fonction d'aggrégation &lt;code&gt;COUNT&lt;/code&gt;, très utile pour compter le nombre d'éléments dans une partition :&lt;/p&gt;
+&lt;p&gt;En plus des fonctions &lt;code&gt;SUM&lt;/code&gt; et &lt;code&gt;AVG&lt;/code&gt; qui ont déjà été présentées, on trouve également la fonction d'agrégation &lt;code&gt;COUNT&lt;/code&gt;, très utile pour compter le nombre d'éléments dans une partition :&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="k"&gt;SELECT&lt;/span&gt;
     &lt;span class="n"&gt;T&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
     &lt;span class="k"&gt;COUNT&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="n"&gt;OVER&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;PARTITION&lt;/span&gt; &lt;span class="k"&gt;BY&lt;/span&gt; &lt;span class="n"&gt;city&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="k"&gt;AS&lt;/span&gt; &lt;span class="ss"&gt;&amp;quot;Count of tx per city&amp;quot;&lt;/span&gt;
@@ -64,10 +70,19 @@
 &lt;/pre&gt;&lt;/div&gt;
 
 
-&lt;h1&gt;TODO: ajouter le order by pour montrer le count cumulé&lt;/h1&gt;
 &lt;p&gt;&lt;img alt="Table des transactions" src="https://datajourney.io/images/001_request_count.png"&gt;&lt;/p&gt;
+&lt;p&gt;En ajoutant la clause &lt;code&gt;ORDER BY&lt;/code&gt; à une fonction de type agrégation, on obtient un effet de cumulation. Dans cet exemple, on calcule la somme cumulée des prix par villes :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="k"&gt;SELECT&lt;/span&gt;
+    &lt;span class="n"&gt;T&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="k"&gt;COUNT&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="n"&gt;OVER&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;PARTITION&lt;/span&gt; &lt;span class="k"&gt;BY&lt;/span&gt; &lt;span class="n"&gt;city&lt;/span&gt; &lt;span class="k"&gt;ORDER&lt;/span&gt; &lt;span class="k"&gt;BY&lt;/span&gt; &lt;span class="n"&gt;price&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="k"&gt;AS&lt;/span&gt; &lt;span class="ss"&gt;&amp;quot;Cumulative Sum of Prices&amp;quot;&lt;/span&gt;
+&lt;span class="k"&gt;FROM&lt;/span&gt;
+    &lt;span class="n"&gt;transactions&lt;/span&gt; &lt;span class="k"&gt;AS&lt;/span&gt; &lt;span class="n"&gt;T&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;img alt="Table des transactions" src="https://datajourney.io/images/001_request_cumulative_sum.png"&gt;&lt;/p&gt;
 &lt;h3&gt;Fonctions de ranking : RANK() et DENSE_RANK()&lt;/h3&gt;
-&lt;p&gt;La fonction &lt;code&gt;RANK&lt;/code&gt; permet créer un préordre (numérotation avec redondance) au sein d'une partition :&lt;/p&gt;
+&lt;p&gt;La fonction &lt;code&gt;RANK&lt;/code&gt; permet de créer un préordre (numérotation avec redondance) au sein d'une partition :&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="k"&gt;SELECT&lt;/span&gt;
     &lt;span class="n"&gt;T&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
     &lt;span class="n"&gt;RANK&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt; &lt;span class="n"&gt;OVER&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;PARTITION&lt;/span&gt; &lt;span class="k"&gt;BY&lt;/span&gt; &lt;span class="n"&gt;city&lt;/span&gt; &lt;span class="k"&gt;ORDER&lt;/span&gt; &lt;span class="k"&gt;BY&lt;/span&gt; &lt;span class="n"&gt;price&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="k"&gt;as&lt;/span&gt; &lt;span class="ss"&gt;&amp;quot;City price ranking&amp;quot;&lt;/span&gt;
@@ -87,8 +102,8 @@
 
 
 &lt;p&gt;&lt;img alt="Table des transactions" src="https://datajourney.io/images/001_request_rank_2.png"&gt;&lt;/p&gt;
-&lt;p&gt;Dans cet exemple, on remarque que deux lignes ont la même valeur "2". Cela s'explique par la colonne &lt;code&gt;price&lt;/code&gt; qui contient deux fois la valeur "1200000".&lt;/p&gt;
-&lt;p&gt;Pour obtenir une numérotation contigue, on utilise la fonction &lt;code&gt;DENSE_RANK&lt;/code&gt; :&lt;/p&gt;
+&lt;p&gt;Dans cet exemple, on remarque que le rang de valeur &lt;code&gt;3&lt;/code&gt; est absent (passage de &lt;code&gt;2&lt;/code&gt; à &lt;code&gt;4&lt;/code&gt;). Cela s'explique par la colonne &lt;code&gt;price&lt;/code&gt; qui contient deux fois la valeur &lt;code&gt;1200000&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;Pour obtenir une numérotation contiguë, on utilise la fonction &lt;code&gt;DENSE_RANK&lt;/code&gt; :&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="k"&gt;SELECT&lt;/span&gt;
     &lt;span class="n"&gt;T&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
     &lt;span class="n"&gt;DENSE_RANK&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt; &lt;span class="n"&gt;OVER&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;ORDER&lt;/span&gt; &lt;span class="k"&gt;BY&lt;/span&gt; &lt;span class="n"&gt;price&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="k"&gt;as&lt;/span&gt; &lt;span class="ss"&gt;&amp;quot;Global price ranking&amp;quot;&lt;/span&gt;
@@ -97,11 +112,11 @@
 &lt;/pre&gt;&lt;/div&gt;
 
 
-&lt;h1&gt;TODO: corriger cette image avec un dense rank (et pas rank)&lt;/h1&gt;
 &lt;p&gt;&lt;img alt="Table des transactions" src="https://datajourney.io/images/001_request_dense_rank.png"&gt;&lt;/p&gt;
+&lt;p&gt;Le rang &lt;code&gt;2&lt;/code&gt; est toujours répété deux fois mais la numérotation a repris au rang &lt;code&gt;3&lt;/code&gt;. C'est pour cela que le &lt;em&gt;rank&lt;/em&gt; est &lt;em&gt;dense&lt;/em&gt;, il n'y a pas de rang manquant.&lt;/p&gt;
 &lt;h3&gt;Fonctions valeurs : FIRST_VALUE() et LAG()&lt;/h3&gt;
-&lt;p&gt;La fonction &lt;code&gt;FIRST_VALUE&lt;/code&gt; permet de récupérer les valeurs de la première ligne de la fenêtre. Un exemple de cas d'usage : connaître le montant de la première transaction boursière du jour (le "O" de OHLC).&lt;/p&gt;
-&lt;p&gt;Dans cet exemple, on récupère pour chaque ville la rue avec la transaction la plus élevée :&lt;/p&gt;
+&lt;p&gt;La fonction &lt;code&gt;FIRST_VALUE&lt;/code&gt; permet de récupérer une valeur de la première ligne de la fenêtre. Un exemple de cas d'usage : connaître le montant de la première transaction boursière du jour (le "O" de OHLC).&lt;/p&gt;
+&lt;p&gt;Dans l'exemple suivant, on récupère pour chaque ville la rue avec la transaction au montant le plus élevé :&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="k"&gt;SELECT&lt;/span&gt;
     &lt;span class="n"&gt;T&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
     &lt;span class="n"&gt;FIRST_VALUE&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;street&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="n"&gt;OVER&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;PARTITION&lt;/span&gt; &lt;span class="k"&gt;BY&lt;/span&gt; &lt;span class="n"&gt;city&lt;/span&gt; &lt;span class="k"&gt;ORDER&lt;/span&gt; &lt;span class="k"&gt;by&lt;/span&gt; &lt;span class="n"&gt;city&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="k"&gt;AS&lt;/span&gt; &lt;span class="ss"&gt;&amp;quot;Most expensive street of the city&amp;quot;&lt;/span&gt;
@@ -111,7 +126,7 @@
 
 
 &lt;p&gt;&lt;img alt="Table des transactions" src="https://datajourney.io/images/001_request_first_value.png"&gt;&lt;/p&gt;
-&lt;p&gt;Une dernière fonction, très utile, permet de récupérer la ligne précédante. Dans cet exemple &lt;code&gt;LAG&lt;/code&gt; est utilisée pour récupérer la date de la transaction précédente :&lt;/p&gt;
+&lt;p&gt;Une dernière fonction, très utile, permet de récupérer la ligne précédente. Dans cet exemple la fonction &lt;code&gt;LAG&lt;/code&gt; est utilisée pour récupérer la date de la transaction précédente :&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="k"&gt;SELECT&lt;/span&gt;
     &lt;span class="n"&gt;T&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
     &lt;span class="n"&gt;LAG&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;tx_date&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="n"&gt;OVER&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;ORDER&lt;/span&gt; &lt;span class="k"&gt;BY&lt;/span&gt; &lt;span class="n"&gt;tx_date&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="k"&gt;AS&lt;/span&gt; &lt;span class="ss"&gt;&amp;quot;Datetime of previous transaction&amp;quot;&lt;/span&gt;
@@ -123,7 +138,7 @@
 &lt;p&gt;&lt;img alt="Table des transactions" src="https://datajourney.io/images/001_request_lag.png"&gt;&lt;/p&gt;
 &lt;h2&gt;À retenir&lt;/h2&gt;
 &lt;ul&gt;
-&lt;li&gt;Les fonction de fenêtrage ont un fonctionnement proche de celui du &lt;code&gt;GROUP BY&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Les fonctions de fenêtrage ont un fonctionnement proche de celui du &lt;code&gt;GROUP BY&lt;/code&gt;&lt;/li&gt;
 &lt;li&gt;Dans beaucoup de situations, elles sont plus performantes et plus lisibles que du code sans fonction de fenêtrage&lt;/li&gt;
 &lt;/ul&gt;</content><category term="articles"></category></entry><entry><title>Le PYTHON PATH</title><link href="https://datajourney.io/le-pythonpath.html" rel="alternate"></link><published>2019-10-17T00:00:00+02:00</published><updated>2019-10-17T00:00:00+02:00</updated><author><name>Benjamin Delmée</name></author><id>tag:datajourney.io,2019-10-17:/le-pythonpath.html</id><summary type="html">&lt;p&gt;Le mécanisme d'import en Python est simple à utiliser, voire même ludique. Mais quand arrive le moment de développer un projet d'envergure, plus rien ne fonctionne. À de nombreuses reprises dans l'histoire de Python ses concepteurs ont fait des choix techniques différents et le mécanisme d'import ne fait pas exception. Un peu déroutant au départ, tout rentre dans l'ordre une fois qu'on a compris le fonctionnement du PYTHON PATH, clé de voute du système d'import de Python.&lt;/p&gt;</summary><content type="html">&lt;p&gt;Le mécanisme d'import en Python est simple à utiliser, voire même ludique. Mais quand arrive le moment de développer un projet d'envergure, plus rien ne fonctionne. À de nombreuses reprises dans l'histoire de Python ses concepteurs ont fait des choix techniques différents et le mécanisme d'import ne fait pas exception. Un peu déroutant au départ, tout rentre dans l'ordre une fois qu'on a compris le fonctionnement du PYTHON PATH, clé de voute du système d'import de Python.&lt;/p&gt;
 &lt;p&gt;Tout au long de cet article, nous supposerons l'existence d'un projet &lt;code&gt;demo&lt;/code&gt; organisé de la manière suivante :&lt;/p&gt;
