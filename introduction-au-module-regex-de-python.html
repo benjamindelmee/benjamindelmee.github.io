@@ -1,0 +1,381 @@
+<!doctype html>
+<html lang="fr">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Bungee+Shade|Source+Sans+Pro&display=swap" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <style>
+        body { background-color: #ECE1C5;}
+        .title a {font-family: 'Bungee Shade', cursive; font-size: 1.2em; color: #292121; text-decoration: none;}
+        .main-content { font-family: 'Source Sans Pro', sans-serif; }
+    </style>
+    
+    <title>Introduction au module Regex de Python</title>
+
+<link rel="stylesheet" type="text/css" href="https://datajourney.io/theme/css/pygment.css" />
+<style>
+    .highlight pre { padding: 5px; border-radius: 2px; color: #d0d0d0; }
+    .main-content img { max-width: 100%; height: auto; }
+    .foot-nav { color: #292121; text-decoration: none; }
+    table { border-collapse: collapse; width: 100%; margin-bottom: 20px; margin-top: 20px;}
+    table th, td { border:1px solid #292121; padding: 3px; }
+    table th { background: #d9ceb2; }
+</style>
+</head>
+<body>
+    
+    <div class="container main-header">
+        <header class="text-center mb-5 mt-5">
+            <h1 class="title"><a href="https://datajourney.io/">Data Journey</a></h1>
+            <p class="lead">#Data #Programmation</p>
+        </header>
+    </div>
+    
+    <div class="container main-content">
+<section>
+    <div class="row">
+        <div class="col"></div>
+        <div class="col-sm-12 col-md-10 col-lg-8">
+            <article>
+                <header>
+                    <h1 class="article-title">Introduction au module Regex de Python</h1>
+<p style="color: grey; font-style: italic;">Par Benjamin Delmée le 27.10.2019 </p>                </header>
+                <p>Pour rappel, le terme <em>regex</em> provient de la contraction du terme <em>regular expression</em> (<em>expression régulière</em> en français). Formellement, les expressions régulières permettent de décrire les grammaires régulières. Il existe plusieurs autres types de grammaires (algébriques, contextuelles et générales) et sont décrites dans la hiérarchie de Chomsky.</p>
+<p>Cependant les grammaires régulières sont généralement suffisantes pour effectuer des tâches de traitement de texte simples telles que la validation automatique de saisie ou encore du data cleaning.</p>
+<p>Par exemple, on peut vérifier si un numéro de téléphone est correctement formé en testant s'il correspond à la grammaire suivante : "5 paires de chiffres, éventuellement séparées par un espace".</p>
+<p>Cette grammaire est décrite par l'expression régulière suivante :</p>
+<div class="highlight"><pre><span></span>((\d\d){4}|(\d\d[ ]){4})\d\d
+</pre></div>
+
+
+<p>En Python, cela donnerait :</p>
+<div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">re</span>
+
+<span class="n">pattern</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;((\d\d){4}|(\d\d[ ]){4})\d\d&#39;</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="p">(</span><span class="n">pattern</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="s1">&#39;01 23 45 67 89&#39;</span><span class="p">)):</span>
+    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Numéro valide&#39;</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Numéro invalide&#39;</span><span class="p">)</span>
+
+<span class="c1"># output: Numéro valide</span>
+</pre></div>
+
+
+<p>Cet article détaille le fonctionnement du module regex de la librairie standard de Python mais ne revient pas sur les fondamentaux des regex.</p>
+<h2>Compilation des regex</h2>
+<p>Avec le module regex de Python, on a le choix entre :</p>
+<ul>
+<li>utiliser les fonctions de matching au <strong>niveau du module</strong></li>
+<li>utiliser les fonctions de matching <strong>de l'objet Pattern</strong></li>
+</ul>
+<p>Les deux méthodes sont équivalentes en matière de fonctionnalités (elles font toutes les deux appel au même code). La différence est essentiellement dans le design du code.</p>
+<p>Lorsqu'on utilise l'objet <code>Pattern</code> on procède en deux étapes. On compile d'abors la regex puis ensuite on effectue des opérations sur les chaînes :</p>
+<div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">re</span>
+
+<span class="c1"># compilation</span>
+<span class="n">p</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;h.*&#39;</span><span class="p">)</span>  <span class="c1"># retourne un objet Pattern</span>
+
+<span class="c1"># opérations</span>
+<span class="n">p</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="s1">&#39;hello&#39;</span><span class="p">)</span>
+<span class="n">p</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;world&#39;</span><span class="p">)</span>
+</pre></div>
+
+
+<p>L'avantage de cette méthode est que l'objet <code>Pattern</code> retourné par <code>re.compile</code> peut être stocké ou passé en paramètre d'une fonction. Le design du code est plus souple. Cependant il est possible de condenser les deux étapes en utilisant les fonctions à disposition au niveau du module :</p>
+<div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">re</span>
+
+<span class="c1"># compilation et opération</span>
+<span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;h.*&#39;</span><span class="p">,</span> <span class="s1">&#39;hello&#39;</span><span class="p">)</span>
+<span class="c1"># compilation et opérations</span>
+<span class="n">re</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;h.*&#39;</span><span class="p">,</span> <span class="s1">&#39;world&#39;</span><span class="p">)</span>
+</pre></div>
+
+
+<p>Le module s'est chargé à notre place d'effectuer la compilation. On peut le voir, par exemple, en regardant le code de la fonction <code>re.match</code> :</p>
+<div class="highlight"><pre><span></span><span class="c1"># $&gt; cat lib/python3.7/re.py</span>
+
+<span class="k">def</span> <span class="nf">match</span><span class="p">(</span><span class="n">pattern</span><span class="p">,</span> <span class="n">string</span><span class="p">,</span> <span class="n">flags</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Try to apply the pattern at the start of the string, returning</span>
+<span class="sd">    a Match object, or None if no match was found.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">_compile</span><span class="p">(</span><span class="n">pattern</span><span class="p">,</span> <span class="n">flags</span><span class="p">)</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">string</span><span class="p">)</span>  <span class="c1"># &lt;- compilation puis matching</span>
+</pre></div>
+
+
+<p>Concernant les performances, dans la plupart des cas les deux méthodes sont équivalentes. En effet le module regex met en cache les derniers patterns compilés :</p>
+<div class="highlight"><pre><span></span><span class="c1"># $&gt; cat lib/python3.7/re.py</span>
+
+<span class="n">_MAXCACHE</span> <span class="o">=</span> <span class="mi">512</span>  <span class="c1"># &lt;- met en cache les 512 derniers patterns compilés</span>
+<span class="k">def</span> <span class="nf">_compile</span><span class="p">(</span><span class="n">pattern</span><span class="p">,</span> <span class="n">flags</span><span class="p">):</span>
+    <span class="c1"># ...</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">_cache</span><span class="p">[</span><span class="nb">type</span><span class="p">(</span><span class="n">pattern</span><span class="p">),</span> <span class="n">pattern</span><span class="p">,</span> <span class="n">flags</span><span class="p">]</span>  <span class="c1"># &lt;- mise en cache</span>
+    <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+        <span class="k">pass</span>
+    <span class="c1"># ...</span>
+</pre></div>
+
+
+<h2>Eviter l'épidémie des backslashes</h2>
+<p><em>The Backslash Plague</em> est le terme utilisé pour désigner ceci :</p>
+<div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">re</span>
+
+<span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\\\\\\</span><span class="s1">d+&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="se">\\</span><span class="s1">1234&#39;</span><span class="p">)</span>
+</pre></div>
+
+
+<p>Une accumulation de backslashes qui rendent la lecture de la regex très difficile pour un humain. Cette "épidémie" de backslashes provient du fait qu'ils sont utilisés par Python <strong>et</strong> par le moteur de regex comme caractère d'échappement. Par conséquent si l'on veut matcher la chaîne <code>\1234</code>, on doit échapper deux fois chaque backslash dans la regex. Une fois pour Python puis une seconde fois pour le moteur de regex, soit un total de quatre backslashes.</p>
+<p>Afin d'économiser un niveau d'échappement, on utilise les <em>raw strings</em> de Python, c'est-à-dire des strings non interprétées. Pour obtenir une <em>raw string</em>, on préfixe la chaîne avec la lettre <code>r</code> :</p>
+<div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">re</span>
+
+<span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;</span><span class="se">\\</span><span class="s1">\d+&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="se">\\</span><span class="s1">1234&#39;</span><span class="p">)</span>
+</pre></div>
+
+
+<h2>Les fonctions de matching</h2>
+<p>Voici la liste des fonctions disponibles dans le module regex :</p>
+<table>
+<thead>
+<tr>
+<th>Fonction</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>match</td>
+<td>Match a regular expression pattern to the beginning of a string.</td>
+</tr>
+<tr>
+<td>fullmatch</td>
+<td>Match a regular expression pattern to all of a string.</td>
+</tr>
+<tr>
+<td>search</td>
+<td>Search a string for the presence of a pattern.</td>
+</tr>
+<tr>
+<td>sub</td>
+<td>Substitute occurrences of a pattern found in a string.</td>
+</tr>
+<tr>
+<td>subn</td>
+<td>Same as sub, but also return the number of substitutions made.</td>
+</tr>
+<tr>
+<td>split</td>
+<td>Split a string by the occurrences of a pattern.</td>
+</tr>
+<tr>
+<td>findall</td>
+<td>Find all occurrences of a pattern in a string.</td>
+</tr>
+<tr>
+<td>finditer</td>
+<td>Return an iterator yielding a Match object for each match.</td>
+</tr>
+<tr>
+<td>compile</td>
+<td>Compile a pattern into a Pattern object.</td>
+</tr>
+<tr>
+<td>purge</td>
+<td>Clear the regular expression cache.</td>
+</tr>
+<tr>
+<td>escape</td>
+<td>Backslash all non-alphanumerics in a string.</td>
+</tr>
+</tbody>
+</table>
+<p>Les exemples ci-dessous introduisent le fonctionnement des fonctions les plus usuelles.</p>
+<h3><code>match</code> vs <code>fullmatch</code> vs <code>search</code> vs <code>findall</code></h3>
+<p>Le fonctionement de ces quatres fonctions est similaire :</p>
+<ul>
+<li><code>match</code> évalue si le <strong>début de la chaine</strong> correspond au pattern</li>
+<li><code>fullmatch</code> évalue si <strong>l'intégralité de la chaine</strong> correspond au pattern</li>
+<li><code>search</code> évalue si <strong>une sous-chaine quelconque</strong> correspond au pattern</li>
+<li><code>findall</code> renvoie toutes les sous-chaines correspondant au pattern</li>
+</ul>
+<div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">re</span>
+
+<span class="n">p1</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s1">&#39;[a-z]+&#39;</span><span class="p">)</span>
+<span class="n">p2</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s1">&#39;[0-9]+&#39;</span><span class="p">)</span>
+
+<span class="c1"># match</span>
+<span class="k">print</span><span class="p">(</span><span class="n">p1</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="s1">&#39;abcd 1234 efgh&#39;</span><span class="p">))</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="o">&lt;</span><span class="n">re</span><span class="o">.</span><span class="n">Match</span> <span class="nb">object</span><span class="p">;</span> <span class="n">span</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span> <span class="n">match</span><span class="o">=</span><span class="s1">&#39;abcd&#39;</span><span class="o">&gt;</span>
+<span class="k">print</span><span class="p">(</span><span class="n">p2</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="s1">&#39;abcd 1234 efgh&#39;</span><span class="p">))</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="bp">None</span>
+
+<span class="c1"># fullmatch</span>
+<span class="k">print</span><span class="p">(</span><span class="n">p1</span><span class="o">.</span><span class="n">fullmatch</span><span class="p">(</span><span class="s1">&#39;abcd 1234 efgh&#39;</span><span class="p">))</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="bp">None</span>
+<span class="k">print</span><span class="p">(</span><span class="n">p2</span><span class="o">.</span><span class="n">fullmatch</span><span class="p">(</span><span class="s1">&#39;abcd 1234 efgh&#39;</span><span class="p">))</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="bp">None</span>
+
+<span class="c1"># search</span>
+<span class="k">print</span><span class="p">(</span><span class="n">p1</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s1">&#39;abcd 1234 efgh&#39;</span><span class="p">))</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="o">&lt;</span><span class="n">re</span><span class="o">.</span><span class="n">Match</span> <span class="nb">object</span><span class="p">;</span> <span class="n">span</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span> <span class="n">match</span><span class="o">=</span><span class="s1">&#39;abcd&#39;</span><span class="o">&gt;</span>
+<span class="k">print</span><span class="p">(</span><span class="n">p2</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s1">&#39;abcd 1234 efgh&#39;</span><span class="p">))</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="o">&lt;</span><span class="n">re</span><span class="o">.</span><span class="n">Match</span> <span class="nb">object</span><span class="p">;</span> <span class="n">span</span><span class="o">=</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">9</span><span class="p">),</span> <span class="n">match</span><span class="o">=</span><span class="s1">&#39;1234&#39;</span><span class="o">&gt;</span>
+
+<span class="c1"># findall</span>
+<span class="k">print</span><span class="p">(</span><span class="n">p1</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="s1">&#39;abcd 1234 efgh&#39;</span><span class="p">))</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="p">[</span><span class="s1">&#39;abcd&#39;</span><span class="p">,</span> <span class="s1">&#39;efgh&#39;</span><span class="p">]</span>
+<span class="k">print</span><span class="p">(</span><span class="n">p2</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="s1">&#39;abcd 1234 efgh&#39;</span><span class="p">))</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="p">[</span><span class="s1">&#39;1234&#39;</span><span class="p">]</span>
+</pre></div>
+
+
+<h3><code>sub</code> et <code>subn</code></h3>
+<p><code>sub</code> et <code>subn</code> permettent de subtituer une chaîne aux sous-chaînes qui matchent le pattern :</p>
+<ul>
+<li><code>sub</code> renvoie une nouvelle chaîne de caractères avec les substitutions effectuées</li>
+<li><code>subn</code> renvoie en plus le nombre de substitutions effectuées</li>
+</ul>
+<div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">re</span>
+
+<span class="n">p</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s1">&#39;[0-9]&#39;</span><span class="p">)</span>
+
+<span class="c1"># sub</span>
+<span class="k">print</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s1">&#39;#&#39;</span><span class="p">,</span> <span class="s1">&#39;10 apples and 20 oranges&#39;</span><span class="p">))</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="s1">&#39;## apples and ## oranges&#39;</span>
+
+<span class="c1"># subn</span>
+<span class="k">print</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">subn</span><span class="p">(</span><span class="s1">&#39;#&#39;</span><span class="p">,</span> <span class="s1">&#39;10 apples and 20 oranges&#39;</span><span class="p">))</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="p">(</span><span class="s1">&#39;## apples and ## oranges&#39;</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+</pre></div>
+
+
+<h3><code>split</code></h3>
+<p>La fonction <code>re.split</code> est très similaire à la fonction <code>str.split</code>, à la différence que le séparateur de <code>re.split</code> est une regex :</p>
+<div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">re</span>
+
+<span class="n">p</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s1">&#39;:+&#39;</span><span class="p">)</span>
+
+<span class="c1"># split</span>
+<span class="k">print</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;abcd:1234::efgh:::5678&#39;</span><span class="p">))</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="p">[</span><span class="s1">&#39;abcd&#39;</span><span class="p">,</span> <span class="s1">&#39;1234&#39;</span><span class="p">,</span> <span class="s1">&#39;efgh&#39;</span><span class="p">,</span> <span class="s1">&#39;5678&#39;</span><span class="p">]</span>
+</pre></div>
+
+
+<h2>Flags de compilation</h2>
+<p>Voici la liste des flags de compilation disponibles dans le module regex :</p>
+<table>
+<thead>
+<tr>
+<th>Flag</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ASCII</td>
+<td>For string patterns, make \w, \W, \b, \B, \d, \D match the corresponding ASCII character categories (rather than the whole Unicode categories, which is the default). For bytes patterns, this flag is the only available behaviour and needn't be specified.</td>
+</tr>
+<tr>
+<td>IGNORECASE</td>
+<td>Perform case-insensitive matching.</td>
+</tr>
+<tr>
+<td>LOCALE</td>
+<td>Make \w, \W, \b, \B, dependent on the current locale.</td>
+</tr>
+<tr>
+<td>MULTILINE</td>
+<td>"^" matches the beginning of lines (after a newline) as well as the string. "$" matches the end of lines (before a newline) as well as the end of the string.</td>
+</tr>
+<tr>
+<td>DOTALL</td>
+<td>"." matches any character at all, including the newline.</td>
+</tr>
+<tr>
+<td>VERBOSE</td>
+<td>Ignore whitespace and comments for nicer looking RE's.</td>
+</tr>
+<tr>
+<td>UNICODE</td>
+<td>For compatibility only. Ignored for string patterns (it is the default), and forbidden for bytes patterns.</td>
+</tr>
+</tbody>
+</table>
+<p>Quelques exemples d'utilisation :</p>
+<h3><code>IGNORECASE</code></h3>
+<p>Le flag <code>IGNORECASE</code> permet de rendre les regex insensibles à la casse.</p>
+<div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">re</span>
+
+<span class="n">p1</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s1">&#39;[a-z]+&#39;</span><span class="p">)</span>
+<span class="n">p2</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s1">&#39;[a-z]+&#39;</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span><span class="p">)</span>
+
+<span class="c1"># without IGNORECASE</span>
+<span class="k">print</span><span class="p">(</span><span class="n">p1</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s1">&#39;helloWORLD&#39;</span><span class="p">))</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="o">&lt;</span><span class="n">re</span><span class="o">.</span><span class="n">Match</span> <span class="nb">object</span><span class="p">;</span> <span class="n">span</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span> <span class="n">match</span><span class="o">=</span><span class="s1">&#39;hello&#39;</span><span class="o">&gt;</span>
+
+<span class="c1"># with IGNORECASE</span>
+<span class="k">print</span><span class="p">(</span><span class="n">p2</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s1">&#39;helloWORLD&#39;</span><span class="p">))</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="o">&lt;</span><span class="n">re</span><span class="o">.</span><span class="n">Match</span> <span class="nb">object</span><span class="p">;</span> <span class="n">span</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span> <span class="n">match</span><span class="o">=</span><span class="s1">&#39;helloWORLD&#39;</span><span class="o">&gt;</span>
+</pre></div>
+
+
+<h3><code>VERBOSE</code></h3>
+<p>Le flag <code>VERBOSE</code> permet d'ajouter des espaces et des commentaires dans les regex. Cela permet une amélioration de la lisibilité de la regex.</p>
+<p>Exemple avec la regex décrivant la syntaxe d'un numéro de téléphone :</p>
+<div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">re</span>
+
+<span class="c1"># without VERBOSE, hard to read</span>
+<span class="n">p</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;((\d\d){4}|(\d\d[ ]){4})\d\d&#39;</span><span class="p">)</span>
+
+<span class="c1"># with VERBOSE, easier to read</span>
+<span class="n">p</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;&#39;&#39;</span>
+<span class="s1">    (</span>
+<span class="s1">        (\d\d){4}           # four times two numbers</span>
+<span class="s1">        | (\d\d[ ]){4}      # or four times two numbers followed by a space</span>
+<span class="s1">    )</span>
+<span class="s1">    \d\d                    # ends with two numbers</span>
+<span class="s1">&#39;&#39;&#39;</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">VERBOSE</span><span class="p">)</span>
+</pre></div>
+            </article>
+        </div>
+        <div class="col"></div>
+    </div>
+</section>
+
+<!-- footer -->
+<div class="row mb-5">
+    <div class="col"></div>
+    <div class="col-sm-12 col-md-10 col-lg-8">
+        <hr>
+        <div class="row">
+            <div class="col">
+                <a href="https://datajourney.io" class="foot-nav">&larr; Page d'acceuil</a>
+            </div>
+            <div class="col text-right">
+                <a href="#top" class="foot-nav">&uarr; Haut de la page</a>
+            </div>
+        </div>
+    </div>
+    <div class="col"></div>
+</div>
+    </div>
+
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-150831892-1"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'UA-150831892-1');
+    </script>
+
+    
+</body>
+</html>
