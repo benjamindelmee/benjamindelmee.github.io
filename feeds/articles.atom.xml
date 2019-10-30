@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>DataJourney - articles</title><link href="https://datajourney.io/" rel="alternate"></link><link href="https://datajourney.io/feeds/articles.atom.xml" rel="self"></link><id>https://datajourney.io/</id><updated>2019-10-27T00:00:00+02:00</updated><entry><title>Introduction au module Regex de Python</title><link href="https://datajourney.io/introduction-au-module-regex-de-python.html" rel="alternate"></link><published>2019-10-27T00:00:00+02:00</published><updated>2019-10-27T00:00:00+02:00</updated><author><name>Benjamin Delmée</name></author><id>tag:datajourney.io,2019-10-27:/introduction-au-module-regex-de-python.html</id><summary type="html">&lt;p&gt;Pour rappel, le terme &lt;em&gt;regex&lt;/em&gt; provient de la contraction du terme &lt;em&gt;regular expression&lt;/em&gt; (&lt;em&gt;expression régulière&lt;/em&gt; en français). Formellement, les expressions régulières permettent de décrire les grammaires régulières. Il existe plusieurs autres types de grammaires (algébriques, contextuelles et générales) et sont décrites dans la hiérarchie de Chomsky.&lt;/p&gt;</summary><content type="html">&lt;p&gt;Pour rappel, le terme &lt;em&gt;regex&lt;/em&gt; provient de la contraction du terme &lt;em&gt;regular expression&lt;/em&gt; (&lt;em&gt;expression régulière&lt;/em&gt; en français). Formellement, les expressions régulières permettent de décrire les grammaires régulières. Il existe plusieurs autres types de grammaires (algébriques, contextuelles et générales) et sont décrites dans la hiérarchie de Chomsky.&lt;/p&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>DataJourney - articles</title><link href="https://datajourney.io/" rel="alternate"></link><link href="https://datajourney.io/feeds/articles.atom.xml" rel="self"></link><id>https://datajourney.io/</id><updated>2019-10-30T00:00:00+01:00</updated><entry><title>Introduction au module Regex de Python</title><link href="https://datajourney.io/introduction-au-module-regex-de-python.html" rel="alternate"></link><published>2019-10-27T00:00:00+02:00</published><updated>2019-10-30T00:00:00+01:00</updated><author><name>Benjamin Delmée</name></author><id>tag:datajourney.io,2019-10-27:/introduction-au-module-regex-de-python.html</id><summary type="html">&lt;p&gt;Pour rappel, le terme &lt;em&gt;regex&lt;/em&gt; provient de la contraction du terme &lt;em&gt;regular expression&lt;/em&gt; (&lt;em&gt;expression régulière&lt;/em&gt; en français). Formellement, les expressions régulières permettent de décrire les grammaires régulières. Il existe plusieurs autres types de grammaires (algébriques, contextuelles et générales) et sont décrites dans la hiérarchie de Chomsky.&lt;/p&gt;</summary><content type="html">&lt;p&gt;Pour rappel, le terme &lt;em&gt;regex&lt;/em&gt; provient de la contraction du terme &lt;em&gt;regular expression&lt;/em&gt; (&lt;em&gt;expression régulière&lt;/em&gt; en français). Formellement, les expressions régulières permettent de décrire les grammaires régulières. Il existe plusieurs autres types de grammaires (algébriques, contextuelles et générales) et sont décrites dans la hiérarchie de Chomsky.&lt;/p&gt;
 &lt;p&gt;Cependant les grammaires régulières sont généralement suffisantes pour effectuer des tâches de traitement de texte simples telles que la validation automatique de saisie ou encore du data cleaning.&lt;/p&gt;
 &lt;p&gt;Par exemple, on peut vérifier si un numéro de téléphone est correctement formé en testant s'il correspond à la grammaire suivante : "5 paires de chiffres, éventuellement séparées par un espace".&lt;/p&gt;
 &lt;p&gt;Cette grammaire est décrite par l'expression régulière suivante :&lt;/p&gt;
@@ -83,7 +83,7 @@
 &lt;/pre&gt;&lt;/div&gt;
 
 
-&lt;p&gt;Une accumulation de backslashes qui rendent la lecture de la regex très difficile pour un humain. Cette "épidémie" de backslashes provient du fait qu'ils sont utilisés par Python &lt;strong&gt;et&lt;/strong&gt; par le moteur de regex comme caractère d'échappement. Par conséquent si l'on veut matcher la chaîne &lt;code&gt;\1234&lt;/code&gt;, on doit échapper deux fois chaque backslash dans la regex. Une fois pour Python puis une seconde fois pour le moteur de regex, soit un total de quatre backslashes.&lt;/p&gt;
+&lt;p&gt;Une accumulation de backslashes qui rendent la lecture de la regex très difficile pour un humain. Cette "épidémie" de backslashes provient du fait qu'ils sont utilisés par Python &lt;strong&gt;et&lt;/strong&gt; par le moteur de regex comme caractère d'échappement. Par conséquent si l'on veut matcher la chaîne &lt;code&gt;\1234&lt;/code&gt;, on doit échapper une première fois la chaîne pour l'interpréteur Python (backslases x2) puis une seconde fois pour le moteur de regex(backslases x2), soit un total de quatre backslashes.&lt;/p&gt;
 &lt;p&gt;Afin d'économiser un niveau d'échappement, on utilise les &lt;em&gt;raw strings&lt;/em&gt; de Python, c'est-à-dire des strings non interprétées. Pour obtenir une &lt;em&gt;raw string&lt;/em&gt;, on préfixe la chaîne avec la lettre &lt;code&gt;r&lt;/code&gt; :&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;re&lt;/span&gt;
 
@@ -92,6 +92,7 @@
 
 
 &lt;h2&gt;Les fonctions de matching&lt;/h2&gt;
+&lt;p&gt;Maintenant que nous savons comment compiler (ou non) les regex et comment éviter que les backslashes polluent la lecture, passons aux fonctions qui permettent d'appliquer ces regex sur des chaînes de caractères.&lt;/p&gt;
 &lt;p&gt;Voici la liste des fonctions disponibles dans le module regex :&lt;/p&gt;
 &lt;table&gt;
 &lt;thead&gt;
@@ -147,7 +148,7 @@
 &lt;/tr&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
-&lt;p&gt;Les exemples ci-dessous introduisent le fonctionnement des fonctions les plus usuelles.&lt;/p&gt;
+&lt;p&gt;Certaines fonctions ont des comportements trés similaires (&lt;code&gt;match&lt;/code&gt; et &lt;code&gt;search&lt;/code&gt; par exemple), les sections ci-dessous abordent les grands types de fonctions et illustrent les nuances par des exemples.&lt;/p&gt;
 &lt;h3&gt;&lt;code&gt;match&lt;/code&gt; vs &lt;code&gt;fullmatch&lt;/code&gt; vs &lt;code&gt;search&lt;/code&gt; vs &lt;code&gt;findall&lt;/code&gt;&lt;/h3&gt;
 &lt;p&gt;Le fonctionement de ces quatres fonctions est similaire :&lt;/p&gt;
 &lt;ul&gt;
@@ -220,6 +221,8 @@
 
 
 &lt;h2&gt;Flags de compilation&lt;/h2&gt;
+&lt;p&gt;Il peut être utile de modifier le comportement du moteur de regex. Par exemple, on veut parfois ne pas faire de distinction entre les lettres minuscules et majuscules. Alors plutôt que de réécrire une regex générique (au détriment de la lisibilité), on peut simplement l'indiquer au moteur de regex avec un flag.&lt;/p&gt;
+&lt;p&gt;Les flags sont optionnels et on peut en utiliser zéro, un ou plusieurs par regex. Pour utiliser plusieurs flags, il suffit de les combiner à l'aide de l'opérateur bit à bit «&lt;code&gt;|&lt;/code&gt;».&lt;/p&gt;
 &lt;p&gt;Voici la liste des flags de compilation disponibles dans le module regex :&lt;/p&gt;
 &lt;table&gt;
 &lt;thead&gt;
@@ -293,7 +296,15 @@
 &lt;span class="s1"&gt;    )&lt;/span&gt;
 &lt;span class="s1"&gt;    \d\d                    # ends with two numbers&lt;/span&gt;
 &lt;span class="s1"&gt;&amp;#39;&amp;#39;&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;re&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;VERBOSE&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;</content><category term="articles"></category></entry><entry><title>Les fonctions de fenêtrage en SQL</title><link href="https://datajourney.io/les-fonctions-de-fenetrage-en-sql.html" rel="alternate"></link><published>2019-10-23T00:00:00+02:00</published><updated>2019-10-23T00:00:00+02:00</updated><author><name>Benjamin Delmée</name></author><id>tag:datajourney.io,2019-10-23:/les-fonctions-de-fenetrage-en-sql.html</id><summary type="html">&lt;p&gt;En SQL, les &lt;em&gt;Window Functions&lt;/em&gt; (fonctions de fenêtrage) sont plus efficaces et plus lisibles que du code équivalent sans window functions. Elles sont aussi simples à comprendre (voir davantage) que l'opérateur &lt;code&gt;GROUP BY&lt;/code&gt; mais sont, pourtant, trop peu utilisées. Détaillons leur fonctionnement pour remédier à cela.&lt;/p&gt;</summary><content type="html">&lt;p&gt;En SQL, les &lt;em&gt;Window Functions&lt;/em&gt; (fonctions de fenêtrage) sont plus efficaces et plus lisibles que du code équivalent sans window functions. Elles sont aussi simples à comprendre (voir davantage) que l'opérateur &lt;code&gt;GROUP BY&lt;/code&gt; mais sont, pourtant, trop peu utilisées. Détaillons leur fonctionnement pour remédier à cela.&lt;/p&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h2&gt;À retenir&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;On peut choisir de compiler ou non les regex. Dans le cas où le nombre de regex utilisées est faible, cela n'a pas d'impact sur les performances grace à la mise en cache.&lt;/li&gt;
+&lt;li&gt;On utilise des &lt;em&gt;raw strings&lt;/em&gt; afin d'éviter la multiplication des backslashes.&lt;/li&gt;
+&lt;li&gt;Les flags de compilation permettent de modifier le comportement du moteur de regex.&lt;/li&gt;
+&lt;/ul&gt;</content><category term="articles"></category></entry><entry><title>Les fonctions de fenêtrage en SQL</title><link href="https://datajourney.io/les-fonctions-de-fenetrage-en-sql.html" rel="alternate"></link><published>2019-10-23T00:00:00+02:00</published><updated>2019-10-23T00:00:00+02:00</updated><author><name>Benjamin Delmée</name></author><id>tag:datajourney.io,2019-10-23:/les-fonctions-de-fenetrage-en-sql.html</id><summary type="html">&lt;p&gt;En SQL, les &lt;em&gt;Window Functions&lt;/em&gt; (fonctions de fenêtrage) sont plus efficaces et plus lisibles que du code équivalent sans window functions. Elles sont aussi simples à comprendre (voir davantage) que l'opérateur &lt;code&gt;GROUP BY&lt;/code&gt; mais sont, pourtant, trop peu utilisées. Détaillons leur fonctionnement pour remédier à cela.&lt;/p&gt;</summary><content type="html">&lt;p&gt;En SQL, les &lt;em&gt;Window Functions&lt;/em&gt; (fonctions de fenêtrage) sont plus efficaces et plus lisibles que du code équivalent sans window functions. Elles sont aussi simples à comprendre (voir davantage) que l'opérateur &lt;code&gt;GROUP BY&lt;/code&gt; mais sont, pourtant, trop peu utilisées. Détaillons leur fonctionnement pour remédier à cela.&lt;/p&gt;
 &lt;p&gt;À la manière du &lt;code&gt;GROUP BY&lt;/code&gt;, les fonctions fenêtrées effectuent des calculs d'agrégations sur des paquets de lignes (qu'on appelle &lt;strong&gt;partitions&lt;/strong&gt;). En revanche, une fois le calcul terminé, les lignes ne sont pas agrégées et le résultat du calcul est ajouté à toutes les lignes de la partition. Le nombre de lignes n'est donc pas modifié et le résultat de la requête contient autant de lignes que la table initiale.&lt;/p&gt;
 &lt;p&gt;Le code et les schémas ci-dessous illustrent la différence entre &lt;code&gt;GROUP BY&lt;/code&gt; et fonctions de fenêtrage.&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="k"&gt;SELECT&lt;/span&gt; &lt;span class="n"&gt;product&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="k"&gt;SUM&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;quantity&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="k"&gt;AVG&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;quantity&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
