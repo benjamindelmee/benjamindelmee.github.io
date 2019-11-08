@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="fr">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Bungee+Shade|Source+Sans+Pro&display=swap" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <style>
+        body { background-color: #ECE1C5;}
+        .title a {font-family: 'Bungee Shade', cursive; font-size: 1.2em; color: #292121; text-decoration: none;}
+        .main-content { font-family: 'Source Sans Pro', sans-serif; }
+    </style>
+    
+    <title>Transfert asynchrone de fichiers avec XMLHttpRequest et Flask</title>
+
+<link rel="stylesheet" type="text/css" href="https://datajourney.io/theme/css/pygment.css" />
+<style>
+    .highlight pre { padding: 5px; border-radius: 2px; color: #d0d0d0; }
+    .main-content img { max-width: 100%; height: auto; }
+    .foot-nav { color: #292121; text-decoration: none; }
+    table { border-collapse: collapse; width: 100%; margin-bottom: 20px; margin-top: 20px;}
+    table th, td { border:1px solid #292121; padding: 3px; }
+    table th { background: #d9ceb2; }
+</style>
+</head>
+<body>
+    
+    <div class="container main-header">
+        <header class="text-center mb-5 mt-5">
+            <h1 class="title"><a href="https://datajourney.io/">Data Journey</a></h1>
+            <p class="lead">#Data #Programmation</p>
+        </header>
+    </div>
+    
+    <div class="container main-content">
+<section>
+    <div class="row">
+        <div class="col"></div>
+        <div class="col-sm-12 col-md-10 col-lg-8">
+            <article>
+                <header>
+                    <h1 class="article-title">Transfert asynchrone de fichiers avec XMLHttpRequest et Flask</h1>
+<p style="color: grey; font-style: italic;">Par Benjamin Delmée le 01.11.2019 </p>                </header>
+                <p>Nous supposons intuitivement que les modifications apportées à notre profil utilisateur sont automatiquement enregistrées et qu'il n'est plus besoin de cliquer sur un bouton pour qu'elles soient prises en compte. Voyons comment les interfaces modernes utilisent les requêtes asynchrones pour parvenir à ce résultat, plus particulièrement pour le transfert de fichiers.</p>
+<h2>Les objets XMLHttpRequest et FormData</h2>
+<p>Commençons par illustrer le fonctionnement d'un formulaire écrit exclusivement en HTML.</p>
+<div class="highlight"><pre><span></span><span class="p">&lt;</span><span class="nt">form</span> <span class="na">action</span><span class="o">=</span><span class="s">&quot;/upload&quot;</span> <span class="na">method</span><span class="o">=</span><span class="s">&quot;POST&quot;</span> <span class="na">enctype</span><span class="o">=</span><span class="s">&quot;multipart/form-data&quot;</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">input</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;text&quot;</span> <span class="na">name</span><span class="o">=</span><span class="s">&quot;desc&quot;</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">input</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;file&quot;</span> <span class="na">name</span><span class="o">=</span><span class="s">&quot;file&quot;</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">input</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;submit&quot;</span> <span class="na">value</span><span class="o">=</span><span class="s">&quot;Go!&quot;</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">form</span><span class="p">&gt;</span>
+</pre></div>
+
+
+<p>Ici tout est géré par le navigateur. Lorsque l'utilisateur appuie sur le bouton de soumission <code>Go!</code>, le navigateur va :</p>
+<ul>
+<li>transformer les données en un ensemble de paires clé/valeur</li>
+<li>envoyer les données <strong>de manière synchrone</strong> au serveur en même temps qu'il <strong>redirige l'utilisateur</strong> vers la page <code>/upload</code></li>
+</ul>
+<p>Cette manière de transmettre des données au serveur est simple et fonctionnelle mais l'expérience utilisateur est assez médiocre, particulièrement à cause du changement de page. Les interfaces modernes ont abandonné ce système et gardent les utilisateurs sur la même page en envoyant les données de manière asynchrone afin de ne pas bloquer l'interface.</p>
+<p>Pour cela, on utilise côté navigateur les objets javascript <code>FormData</code> et <code>XMLHttpRequest</code> qui servent respectivement à construire des formulaires et à envoyer des requêtes de manière asynchrone. Ils permettent de construire des interfaces de transfert de données plus complexes que celles réalisables avec du code HTML seul.</p>
+<p>Le code ci-dessous utilise <code>FormData</code> et <code>XMLHttpRequest</code> pour construire le formulaire et l'envoyer de manière asynchrone, sans forcer l'utilisateur à quitter la page :</p>
+<div class="highlight"><pre><span></span><span class="p">&lt;</span><span class="nt">form</span> <span class="na">id</span><span class="o">=</span><span class="s">&quot;form&quot;</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">input</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;text&quot;</span> <span class="na">name</span><span class="o">=</span><span class="s">&quot;desc&quot;</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">input</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;file&quot;</span> <span class="na">name</span><span class="o">=</span><span class="s">&quot;file&quot;</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">input</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;submit&quot;</span> <span class="na">value</span><span class="o">=</span><span class="s">&quot;Go!&quot;</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">form</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">div</span> <span class="na">id</span><span class="o">=</span><span class="s">&quot;result&quot;</span><span class="p">&gt;&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+
+<span class="p">&lt;</span><span class="nt">script</span><span class="p">&gt;</span>
+    <span class="nb">document</span><span class="p">.</span><span class="nx">querySelector</span><span class="p">(</span><span class="s1">&#39;#form&#39;</span><span class="p">).</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s1">&#39;submit&#39;</span><span class="p">,</span> <span class="p">(</span><span class="nx">event</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="p">{</span>
+        <span class="c1">// do not submit the form with the default mecanism</span>
+        <span class="nx">event</span><span class="p">.</span><span class="nx">preventDefault</span><span class="p">();</span>
+
+        <span class="c1">// pack data to be sent in a FormData object</span>
+        <span class="kd">var</span> <span class="nx">formData</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">FormData</span><span class="p">(</span><span class="nx">event</span><span class="p">.</span><span class="nx">target</span><span class="p">)</span>
+
+        <span class="c1">// send data through a XHR request</span>
+        <span class="kd">var</span> <span class="nx">req</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">XMLHttpRequest</span><span class="p">();</span>
+        <span class="nx">req</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s1">&#39;load&#39;</span><span class="p">,</span> <span class="p">(</span><span class="nx">res</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="p">{</span> <span class="nb">document</span><span class="p">.</span><span class="nx">querySelector</span><span class="p">(</span><span class="s1">&#39;#result&#39;</span><span class="p">).</span><span class="nx">textContent</span> <span class="o">=</span> <span class="nx">req</span><span class="p">.</span><span class="nx">response</span> <span class="p">});</span>
+        <span class="nx">req</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s1">&#39;error&#39;</span><span class="p">,</span> <span class="p">(</span><span class="nx">res</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="p">{</span> <span class="nb">document</span><span class="p">.</span><span class="nx">querySelector</span><span class="p">(</span><span class="s1">&#39;#result&#39;</span><span class="p">).</span><span class="nx">textContent</span> <span class="o">=</span> <span class="nx">req</span><span class="p">.</span><span class="nx">response</span> <span class="p">});</span>
+        <span class="nx">req</span><span class="p">.</span><span class="nx">open</span><span class="p">(</span><span class="s1">&#39;POST&#39;</span><span class="p">,</span> <span class="s1">&#39;/upload&#39;</span><span class="p">);</span>
+        <span class="nx">req</span><span class="p">.</span><span class="nx">send</span><span class="p">(</span><span class="nx">formData</span><span class="p">);</span>
+    <span class="p">});</span>
+<span class="p">&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
+</pre></div>
+
+
+<p>Quelques remarques :</p>
+<ul>
+<li>Les valeurs des attributs <code>action</code> et <code>methode</code> ne sont plus renseignées dans le formulaire mais lors de l'appel à la méthode <code>XMLHttpRequest.open</code></li>
+<li>L'attribut <code>enctype</code> a disparu du formulaire car il n'est plus nécessaire. La valeur du Content-Type est déterminée automatiquement lors de l'appel à la méthode <code>XMLHttpRequest.send</code>. Dans cet exemple il sera automatiquement fixé à <code>multipart/form-data</code> car le formulaire contient un champ de type <code>file</code></li>
+</ul>
+<p>Cette méthode permet de soumettre facilement un formulaire de manière asynchrone et elle a l'avantage de garder fonctionnel le mécanisme de validation des champs : si l'utilisateur tente de soumettre un champ marqué <code>required</code> sans l'avoir rempli alors le navigateur bloquera l'envoi du formulaire.</p>
+<p>Mais on peut aller plus loin et choisir de construire le formulaire soi-même:</p>
+<div class="highlight"><pre><span></span><span class="p">&lt;</span><span class="nt">input</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;text&quot;</span> <span class="na">name</span><span class="o">=</span><span class="s">&quot;desc&quot;</span>   <span class="na">id</span><span class="o">=</span><span class="s">&quot;desc&quot;</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">input</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;file&quot;</span> <span class="na">name</span><span class="o">=</span><span class="s">&quot;file&quot;</span>   <span class="na">id</span><span class="o">=</span><span class="s">&quot;file&quot;</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">input</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;submit&quot;</span> <span class="na">value</span><span class="o">=</span><span class="s">&quot;Go!&quot;</span> <span class="na">id</span><span class="o">=</span><span class="s">&quot;go&quot;</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">div</span> <span class="na">id</span><span class="o">=</span><span class="s">&quot;result&quot;</span><span class="p">&gt;&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+
+<span class="p">&lt;</span><span class="nt">script</span><span class="p">&gt;</span>
+    <span class="nb">document</span><span class="p">.</span><span class="nx">querySelector</span><span class="p">(</span><span class="s1">&#39;#go&#39;</span><span class="p">).</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s1">&#39;click&#39;</span><span class="p">,</span> <span class="p">(</span><span class="nx">event</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="p">{</span>
+        <span class="c1">// pack data to be sent in a FormData object</span>
+        <span class="kd">var</span> <span class="nx">formData</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">FormData</span><span class="p">()</span>
+        <span class="nx">formData</span><span class="p">.</span><span class="nx">append</span><span class="p">(</span><span class="s1">&#39;desc&#39;</span><span class="p">,</span> <span class="nb">document</span><span class="p">.</span><span class="nx">querySelector</span><span class="p">(</span><span class="s1">&#39;#desc&#39;</span><span class="p">).</span><span class="nx">value</span><span class="p">);</span>
+        <span class="nx">formData</span><span class="p">.</span><span class="nx">append</span><span class="p">(</span><span class="s1">&#39;file&#39;</span><span class="p">,</span> <span class="nb">document</span><span class="p">.</span><span class="nx">querySelector</span><span class="p">(</span><span class="s1">&#39;#file&#39;</span><span class="p">).</span><span class="nx">files</span><span class="p">[</span><span class="mi">0</span><span class="p">]);</span>
+
+        <span class="c1">// send data through a XHR request</span>
+        <span class="kd">var</span> <span class="nx">req</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">XMLHttpRequest</span><span class="p">();</span>
+        <span class="nx">req</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s1">&#39;load&#39;</span><span class="p">,</span> <span class="p">(</span><span class="nx">res</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="p">{</span> <span class="nb">document</span><span class="p">.</span><span class="nx">querySelector</span><span class="p">(</span><span class="s1">&#39;#result&#39;</span><span class="p">).</span><span class="nx">textContent</span> <span class="o">=</span> <span class="nx">req</span><span class="p">.</span><span class="nx">response</span> <span class="p">});</span>
+        <span class="nx">req</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s1">&#39;error&#39;</span><span class="p">,</span> <span class="p">(</span><span class="nx">res</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="p">{</span> <span class="nb">document</span><span class="p">.</span><span class="nx">querySelector</span><span class="p">(</span><span class="s1">&#39;#result&#39;</span><span class="p">).</span><span class="nx">textContent</span> <span class="o">=</span> <span class="nx">req</span><span class="p">.</span><span class="nx">response</span> <span class="p">});</span>
+        <span class="nx">req</span><span class="p">.</span><span class="nx">open</span><span class="p">(</span><span class="s1">&#39;POST&#39;</span><span class="p">,</span> <span class="s1">&#39;/upload&#39;</span><span class="p">);</span>
+        <span class="nx">req</span><span class="p">.</span><span class="nx">send</span><span class="p">(</span><span class="nx">formData</span><span class="p">);</span>
+    <span class="p">});</span>
+<span class="p">&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
+</pre></div>
+
+
+<p>Quelques remarques :</p>
+<ul>
+<li>La balise <code>form</code> a disparu car elle n'est plus nécessaire. Par conséquent il n'est plus nécessaire de bloquer la soumission par défaut du formulaire avec l'instruction <code>event.preventDefault()</code></li>
+<li>Le formulaire est construit manuellement en ajoutant les champs un par un à l'aide de la méthode <code>FormData.append</code></li>
+<li>L'instruction <code>document.querySelector('#file').files</code> retourne un objet de type <code>FileList</code> qui permet d'accéder aux fichiers du champ <code>file</code> (il peut y avoir plusieurs fichiers dans le cas où l'attribut <code>multiple</code> est mentionné dans la déclaration de l'input).</li>
+</ul>
+<p>Cette méthode permet d'avoir davantage de contrôle sur les données envoyées mais attention, en contrepartie, la validation des champs par le navigateur ne fonctionne pas avec cette méthode.</p>
+<h2>Réception des fichiers avec Flask</h2>
+<p>Le code Flask ci-dessous permet de gérer la réception du formulaire rédigé dans la première partie de cet article. Il décrit un unique endpoint <code>/upload</code> requêtable via la méthode <code>POST</code> et qui affiche dans la console les noms et les valeurs des champs du formulaire.</p>
+<div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">flask</span> <span class="kn">import</span> <span class="n">Flask</span><span class="p">,</span> <span class="n">request</span>
+
+<span class="n">app</span> <span class="o">=</span> <span class="n">Flask</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+<span class="nd">@app.route</span><span class="p">(</span><span class="s1">&#39;/upload&#39;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;POST&#39;</span><span class="p">])</span>
+<span class="k">def</span> <span class="nf">upload</span><span class="p">():</span>
+    <span class="c1"># iterate over the fields</span>
+    <span class="k">for</span> <span class="n">field_name</span><span class="p">,</span> <span class="n">field_value</span> <span class="ow">in</span> <span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="o">.</span><span class="n">items</span><span class="p">(</span><span class="n">multi</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Field: {} Value: {}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">field_name</span><span class="p">,</span> <span class="n">field_value</span><span class="p">))</span>
+
+    <span class="c1"># iterate over the files</span>
+    <span class="k">for</span> <span class="n">field_name</span><span class="p">,</span> <span class="n">field_file</span> <span class="ow">in</span> <span class="n">request</span><span class="o">.</span><span class="n">files</span><span class="o">.</span><span class="n">items</span><span class="p">(</span><span class="n">multi</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">field_file</span><span class="o">.</span><span class="n">filename</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s1">&#39;File not submitted&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Field: {} File: {}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">field_name</span><span class="p">,</span> <span class="n">field_file</span><span class="o">.</span><span class="n">filename</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="s1">&#39;OK&#39;</span>
+</pre></div>
+
+
+<p>Une fois le formulaire soumis par l'utilisateur, les données réceptionnées sont stockées par Flask dans les variables <code>request.form</code> et <code>request.files</code>. Ces variables sont de type <code>ImmutableMultiDict</code>, qui correspond à un dictionnaire immutable possédant une ou plusieurs valeurs par clé.</p>
+<p>Pourquoi avoir besoin de plusieurs valeurs par clé ? Car plusieurs <code>&lt;input&gt;</code> peuvent avoir le même attribut <code>name</code> :</p>
+<div class="highlight"><pre><span></span><span class="p">&lt;</span><span class="nt">form</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">input</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;file&quot;</span> <span class="na">name</span><span class="o">=</span><span class="s">&quot;myfile&quot;</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">input</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;file&quot;</span> <span class="na">name</span><span class="o">=</span><span class="s">&quot;myfile&quot;</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">input</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;file&quot;</span> <span class="na">name</span><span class="o">=</span><span class="s">&quot;myfile&quot;</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">form</span><span class="p">&gt;</span>
+</pre></div>
+
+
+<p>Même si l'usage veut que chaque <code>&lt;input&gt;</code> possède un attribut <code>name</code> unique de manière à pouvoir l'identifier facilement côté serveur, rien ne l'oblige techniquement. C'est notamment le cas lorsqu'on ajoute dynamiquement des champs en javascript au fur et à mesure de la saisie de l'utilisateur, il n'est pas toujours nécessaire de les nommer de manière unique.</p>
+<p>On peut itérer sur un objet <code>ImmutableMultiDict</code> avec la méthode <code>.items(multi=True)</code>. Si le paramètre <code>multi=True</code> n'est pas spécifié, uniquement la première valeur de chaque clé sera itérée. Dans notre formulaire cela ne change rien car chaque champ possède un attribut <code>name</code> unique et par conséquent chaque clé possède une unique valeur.</p>
+<p>Dans le cas où l'on veut enregistrer les fichiers sur le disque tout en gardant leur nom d'origine, il est nécessaire de s'assurer que ce nom n'ait pas été forgé par un attaquant. On utilise pour cela la fonction <code>secure_filename</code> du module <code>werkzeug.utils</code> livrée avec Flask :</p>
+<div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">flask</span> <span class="kn">import</span> <span class="n">Flask</span><span class="p">,</span> <span class="n">request</span>
+<span class="kn">from</span> <span class="nn">werkzeug.utils</span> <span class="kn">import</span> <span class="n">secure_filename</span>
+
+<span class="n">app</span> <span class="o">=</span> <span class="n">Flask</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+<span class="nd">@app.route</span><span class="p">(</span><span class="s1">&#39;/upload&#39;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;POST&#39;</span><span class="p">])</span>
+<span class="k">def</span> <span class="nf">upload</span><span class="p">():</span>
+    <span class="c1"># iterate over the files</span>
+    <span class="k">for</span> <span class="n">field_name</span><span class="p">,</span> <span class="n">field_file</span> <span class="ow">in</span> <span class="n">request</span><span class="o">.</span><span class="n">files</span><span class="o">.</span><span class="n">items</span><span class="p">(</span><span class="n">multi</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">field_file</span><span class="o">.</span><span class="n">filename</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+            <span class="n">filename</span> <span class="o">=</span> <span class="n">secure_filename</span><span class="p">(</span><span class="n">field_file</span><span class="o">.</span><span class="n">filename</span><span class="p">)</span>
+            <span class="n">field_file</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;/upload/directory&#39;</span><span class="p">,</span> <span class="n">filename</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="s1">&#39;OK&#39;</span>
+</pre></div>
+
+
+<h2>À retenir</h2>
+<ul>
+<li>Côté client, les objets <code>XMLHttpRequest</code> et <code>FormData</code> peuvent être utilisés pour envoyer des requêtes asynchrones</li>
+<li>Côté serveur, Flask gère automatiquement les formulaires et met à disposition les données dans les variables <code>request.form</code> et <code>request.files</code></li>
+</ul>
+            </article>
+        </div>
+        <div class="col"></div>
+    </div>
+</section>
+
+<!-- footer -->
+<div class="row mb-5">
+    <div class="col"></div>
+    <div class="col-sm-12 col-md-10 col-lg-8">
+        <hr>
+        <div class="row">
+            <div class="col">
+                <a href="https://datajourney.io" class="foot-nav">&larr; Page d'acceuil</a>
+            </div>
+            <div class="col text-right">
+                <a href="#top" class="foot-nav">&uarr; Haut de la page</a>
+            </div>
+        </div>
+    </div>
+    <div class="col"></div>
+</div>
+    </div>
+
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-150831892-1"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'UA-150831892-1');
+    </script>
+
+    
+</body>
+</html>
