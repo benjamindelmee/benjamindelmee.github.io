@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="fr">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Bungee+Shade|Source+Sans+Pro&display=swap" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <style>
+        body { background-color: #ECE1C5;}
+        .title a {font-family: 'Bungee Shade', cursive; font-size: 1.2em; color: #292121; text-decoration: none;}
+        .main-content { font-family: 'Source Sans Pro', sans-serif; }
+    </style>
+    
+    <title>Écrire un parseur de fichiers CSV en Python</title>
+
+<link rel="stylesheet" type="text/css" href="https://datajourney.io/theme/css/pygment.css" />
+<style>
+    .highlight pre { padding: 5px; border-radius: 2px; color: #d0d0d0; }
+    .main-content img { max-width: 100%; height: auto; }
+    .foot-nav { color: #292121; text-decoration: none; }
+    table { border-collapse: collapse; width: 100%; margin-bottom: 20px; margin-top: 20px;}
+    table th, td { border:1px solid #292121; padding: 3px; }
+    table th { background: #d9ceb2; }
+</style>
+</head>
+<body>
+    
+    <div class="container main-header">
+        <header class="text-center mb-5 mt-5">
+            <h1 class="title"><a href="https://datajourney.io/">Data Journey</a></h1>
+            <p class="lead">#Data #Programmation</p>
+        </header>
+    </div>
+    
+    <div class="container main-content">
+<section>
+    <div class="row">
+        <div class="col"></div>
+        <div class="col-sm-12 col-md-10 col-lg-8">
+            <article>
+                <header>
+                    <h1 class="article-title">Écrire un parseur de fichiers CSV en Python</h1>
+<p style="color: grey; font-style: italic;">Par Benjamin Delmée le 10.11.2019 </p>                </header>
+                <p>Toutes les analyses de données commencent par la récupération des données nécessaires à la conduite de l'analyse. Elles sont souvent extraites de systèmes existants puis sont stockées sous forme de fichiers plats (généralement CSV). Malheureusement les fonctions d'export des systèmes ne respectent pas toujours les règles du format CSV ce qui engendre des problèmes lors de la phase d'ingestion ou d'analyse.</p>
+<p>Les anomalies les plus fréquentes sont :</p>
+<ul>
+<li>Les chaînes de caractères ne sont pas délimitées, ce qui engendre un décalage de colonnes lorsqu'elles contiennent un séparateur ou un split de la ligne lorsqu'elles contiennent un retour à la ligne</li>
+<li>Les délimiteurs de chaînes ne sont pas doublés, ce qui engendre une erreur d'interprétation lorsqu'une chaîne contient un délimiteur</li>
+</ul>
+<p>Ces erreurs sont parfois difficiles à corriger. Plus grave encore, elles ne sont parfois pas détectées car les outils de data ingestion (comme Pandas) sont par défaut très tolérants et construisent des tables avec un nombre erroné de colonnes ou de lignes.</p>
+<p>Fort heureusement on peut écrire un parseur de CSV qui vérifie automatiquement la conformité d'un fichier et nous donner la garantie que nos sources sont fiables ou nous aider à trouver les erreurs lorsqu'il y en a.</p>
+<h2>Représentation de la grammaire d'un fichier CSV via un graphe d'états-transitions</h2>
+<p>La grammaire d'un fichier CSV est décrite dans la <a href="https://tools.ietf.org/html/rfc4180">RFC 4180</a>. Elle est de type régulière, donc descriptible par un automate fini et déterministe :</p>
+<p><img alt="Automate fini et déterministe de la grammaire d'un CSV" src="https://datajourney.io/images/005_grammar_csv.png"></p>
+<p>Ce graphe d'états-transitions fonctionne de la manière suivante : les caractères du fichier CSV sont lus un par un. À chaque lecture d'un nouveau caractère l'état courant est mis à jour en fonction de la règle de transition. Dans le cas où le fichier CSV est conforme à la RFC 4180, l'état final (c'est-à-dire l'état courant après la lecture du dernier caractère du fichier) sera l'état <code>Valid Grammar</code>.</p>
+<p>Voici un exemple avec une ligne de fichier CSV non conforme :</p>
+<div class="highlight"><pre><span></span>200,&quot;Susan&quot;Smith&quot;,30
+</pre></div>
+
+
+<ul>
+<li>L'automate est initialisé à l'état n°0</li>
+<li>À la lecture des caractères <code>200</code> l'automate bascule dans l'état n°1 et boucle</li>
+<li>À la lecture du caractère <code>,</code> l'automate bascule dans l'état n°0</li>
+<li>À la lecture du caractère <code>"</code> l'automate bascule dans l'état n°2</li>
+<li>À la lecture des caractères <code>Susan</code> l'automate boucle sur l'état n°2</li>
+<li>À la lecture du caractère <code>"</code> l'automate bascule dans l'état n°3</li>
+<li>À la lecture du caractère <code>S</code> l'automate bascule dans l'état <code>Invalid grammar</code></li>
+</ul>
+<p>Explication : la RFC 4180 stipule que les délimiteurs de texte (ici <code>"</code>) compris dans les chaînes de caractères doivent être doublés pour éviter toute ambiguïté avec le délimiteur réel de fin de chaîne.</p>
+<h2>Implémentation du graphe états-transitions en Python</h2>
+<p>Le graphe d'états-transitions peut être implémenté simplement à l'aide d'une boucle et de quelques branchements conditionnels.</p>
+<div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">is_valid</span><span class="p">(</span><span class="n">stream</span><span class="p">,</span> <span class="n">sep</span><span class="p">,</span> <span class="n">quotechar</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Tells if a stream respects the CSV grammar.</span>
+
+<span class="sd">    Returns: tuple(bool, int)</span>
+<span class="sd">        - (bool) True if the stream is valid, False otherwise</span>
+<span class="sd">        - (int) Number of the line where the syntax error lays, 0 if no error</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">quotechar</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="c1"># always True if the csv isn&#39;t escaped</span>
+        <span class="k">return</span> <span class="p">[</span><span class="bp">True</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+
+    <span class="n">cur_state</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">line</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">stream</span><span class="p">):</span>
+
+        <span class="n">line</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\r\n</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">char</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+
+            <span class="k">if</span> <span class="n">cur_state</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">char</span> <span class="o">==</span> <span class="n">quotechar</span><span class="p">:</span>
+                    <span class="n">cur_state</span> <span class="o">=</span> <span class="mi">2</span>
+                <span class="k">elif</span> <span class="n">char</span> <span class="o">==</span> <span class="n">sep</span><span class="p">:</span>
+                    <span class="k">pass</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">cur_state</span> <span class="o">=</span> <span class="mi">1</span>
+
+            <span class="k">elif</span> <span class="n">cur_state</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">char</span> <span class="o">==</span> <span class="n">sep</span><span class="p">:</span>
+                    <span class="n">cur_state</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="k">elif</span> <span class="n">char</span> <span class="o">==</span> <span class="n">quotechar</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="p">[</span><span class="bp">False</span><span class="p">,</span> <span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="c1"># syntax error</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">pass</span>
+
+            <span class="k">elif</span> <span class="n">cur_state</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">char</span> <span class="o">==</span> <span class="n">quotechar</span><span class="p">:</span>
+                    <span class="n">cur_state</span> <span class="o">=</span> <span class="mi">3</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">pass</span>
+
+            <span class="k">elif</span> <span class="n">cur_state</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">char</span> <span class="o">==</span> <span class="n">quotechar</span><span class="p">:</span>
+                    <span class="n">cur_state</span> <span class="o">=</span> <span class="mi">2</span>
+                <span class="k">elif</span> <span class="n">char</span> <span class="o">==</span> <span class="n">sep</span><span class="p">:</span>
+                    <span class="n">cur_state</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="p">[</span><span class="bp">False</span><span class="p">,</span> <span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="c1"># syntax error</span>
+
+        <span class="c1"># end of the line reached</span>
+        <span class="c1"># equivalent of reaching \n character</span>
+        <span class="k">if</span> <span class="n">cur_state</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">cur_state</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="c1"># end of the stream reached</span>
+    <span class="c1"># equivalent of reaching EOF character</span>
+    <span class="k">if</span> <span class="n">cur_state</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">[</span><span class="bp">False</span><span class="p">,</span> <span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="c1"># syntax error</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">[</span><span class="bp">True</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="n">csv_1</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;700,&quot;John Smith&quot;,45&#39;</span><span class="p">]</span>
+<span class="n">csv_2</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;200,&quot;Susan&quot;Smith&quot;,30&#39;</span><span class="p">]</span>
+
+<span class="n">is_valid</span><span class="p">(</span><span class="n">csv_1</span><span class="p">,</span> <span class="s1">&#39;,&#39;</span><span class="p">,</span> <span class="s1">&#39;&quot;&#39;</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="p">[</span><span class="bp">True</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+
+<span class="n">is_valid</span><span class="p">(</span><span class="n">csv_2</span><span class="p">,</span> <span class="s1">&#39;,&#39;</span><span class="p">,</span> <span class="s1">&#39;&quot;&#39;</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="p">[</span><span class="bp">False</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+</pre></div>
+
+
+<h2>Bonus : Module Python</h2>
+<p>Ce code est disponible sous-forme d'un module Python, accessible depuis ce repository git : <a href="https://github.com/benjamindelmee/safe-csv">github.com/benjamindelmee/safe-csv</a>.</p>
+<p>Le module contient d'autres tests utiles aux data analystes comme par exemple :</p>
+<ul>
+<li>test si chaque ligne possède le même nombre de colonnes</li>
+<li>test si les noms de colonnes sont uniques</li>
+<li>test si les headers ne contiennent pas de caractères spéciaux</li>
+<li>...</li>
+</ul>
+<p>Le code est ouvert aux contributions.</p>
+            </article>
+        </div>
+        <div class="col"></div>
+    </div>
+</section>
+
+<!-- footer -->
+<div class="row mb-5">
+    <div class="col"></div>
+    <div class="col-sm-12 col-md-10 col-lg-8">
+        <hr>
+        <div class="row">
+            <div class="col">
+                <a href="https://datajourney.io" class="foot-nav">&larr; Page d'acceuil</a>
+            </div>
+            <div class="col text-right">
+                <a href="#top" class="foot-nav">&uarr; Haut de la page</a>
+            </div>
+        </div>
+    </div>
+    <div class="col"></div>
+</div>
+    </div>
+
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-150831892-1"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'UA-150831892-1');
+    </script>
+
+    
+</body>
+</html>

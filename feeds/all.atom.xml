@@ -1,5 +1,118 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>DataJourney</title><link href="https://datajourney.io/" rel="alternate"></link><link href="https://datajourney.io/feeds/all.atom.xml" rel="self"></link><id>https://datajourney.io/</id><updated>2019-11-08T00:00:00+01:00</updated><entry><title>Transfert asynchrone de fichiers avec XMLHttpRequest et Flask</title><link href="https://datajourney.io/transfert-asynchrone-de-fichiers-avec-XMLHttpRequest-flask.html" rel="alternate"></link><published>2019-11-08T00:00:00+01:00</published><updated>2019-11-08T00:00:00+01:00</updated><author><name>Benjamin Delmée</name></author><id>tag:datajourney.io,2019-11-08:/transfert-asynchrone-de-fichiers-avec-XMLHttpRequest-flask.html</id><summary type="html">&lt;p&gt;Nous supposons intuitivement que les modifications apportées à notre profil utilisateur sont automatiquement enregistrées et qu'il n'est plus besoin de cliquer sur un bouton pour qu'elles soient prises en compte. Voyons comment les interfaces modernes utilisent les requêtes asynchrones pour parvenir à ce résultat, plus particulièrement pour le transfert de fichiers.&lt;/p&gt;</summary><content type="html">&lt;p&gt;Nous supposons intuitivement que les modifications apportées à notre profil utilisateur sont automatiquement enregistrées et qu'il n'est plus besoin de cliquer sur un bouton pour qu'elles soient prises en compte. Voyons comment les interfaces modernes utilisent les requêtes asynchrones pour parvenir à ce résultat, plus particulièrement pour le transfert de fichiers.&lt;/p&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>DataJourney</title><link href="https://datajourney.io/" rel="alternate"></link><link href="https://datajourney.io/feeds/all.atom.xml" rel="self"></link><id>https://datajourney.io/</id><updated>2019-11-10T00:00:00+01:00</updated><entry><title>Écrire un parseur de fichiers CSV en Python</title><link href="https://datajourney.io/ecrire-un-parseur-csv-en-python.html" rel="alternate"></link><published>2019-11-10T00:00:00+01:00</published><updated>2019-11-10T00:00:00+01:00</updated><author><name>Benjamin Delmée</name></author><id>tag:datajourney.io,2019-11-10:/ecrire-un-parseur-csv-en-python.html</id><summary type="html">&lt;p&gt;Toutes les analyses de données commencent par la récupération des données nécessaires à la conduite de l'analyse. Elles sont souvent extraites de systèmes existants puis sont stockées sous forme de fichiers plats (généralement CSV). Malheureusement les fonctions d'export des systèmes ne respectent pas toujours les règles du format CSV ce qui engendre des problèmes lors de la phase d'ingestion ou d'analyse.&lt;/p&gt;</summary><content type="html">&lt;p&gt;Toutes les analyses de données commencent par la récupération des données nécessaires à la conduite de l'analyse. Elles sont souvent extraites de systèmes existants puis sont stockées sous forme de fichiers plats (généralement CSV). Malheureusement les fonctions d'export des systèmes ne respectent pas toujours les règles du format CSV ce qui engendre des problèmes lors de la phase d'ingestion ou d'analyse.&lt;/p&gt;
+&lt;p&gt;Les anomalies les plus fréquentes sont :&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Les chaînes de caractères ne sont pas délimitées, ce qui engendre un décalage de colonnes lorsqu'elles contiennent un séparateur ou un split de la ligne lorsqu'elles contiennent un retour à la ligne&lt;/li&gt;
+&lt;li&gt;Les délimiteurs de chaînes ne sont pas doublés, ce qui engendre une erreur d'interprétation lorsqu'une chaîne contient un délimiteur&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Ces erreurs sont parfois difficiles à corriger. Plus grave encore, elles ne sont parfois pas détectées car les outils de data ingestion (comme Pandas) sont par défaut très tolérants et construisent des tables avec un nombre erroné de colonnes ou de lignes.&lt;/p&gt;
+&lt;p&gt;Fort heureusement on peut écrire un parseur de CSV qui vérifie automatiquement la conformité d'un fichier et nous donner la garantie que nos sources sont fiables ou nous aider à trouver les erreurs lorsqu'il y en a.&lt;/p&gt;
+&lt;h2&gt;Représentation de la grammaire d'un fichier CSV via un graphe d'états-transitions&lt;/h2&gt;
+&lt;p&gt;La grammaire d'un fichier CSV est décrite dans la &lt;a href="https://tools.ietf.org/html/rfc4180"&gt;RFC 4180&lt;/a&gt;. Elle est de type régulière, donc descriptible par un automate fini et déterministe :&lt;/p&gt;
+&lt;p&gt;&lt;img alt="Automate fini et déterministe de la grammaire d'un CSV" src="https://datajourney.io/images/005_grammar_csv.png"&gt;&lt;/p&gt;
+&lt;p&gt;Ce graphe d'états-transitions fonctionne de la manière suivante : les caractères du fichier CSV sont lus un par un. À chaque lecture d'un nouveau caractère l'état courant est mis à jour en fonction de la règle de transition. Dans le cas où le fichier CSV est conforme à la RFC 4180, l'état final (c'est-à-dire l'état courant après la lecture du dernier caractère du fichier) sera l'état &lt;code&gt;Valid Grammar&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;Voici un exemple avec une ligne de fichier CSV non conforme :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;200,&amp;quot;Susan&amp;quot;Smith&amp;quot;,30
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;ul&gt;
+&lt;li&gt;L'automate est initialisé à l'état n°0&lt;/li&gt;
+&lt;li&gt;À la lecture des caractères &lt;code&gt;200&lt;/code&gt; l'automate bascule dans l'état n°1 et boucle&lt;/li&gt;
+&lt;li&gt;À la lecture du caractère &lt;code&gt;,&lt;/code&gt; l'automate bascule dans l'état n°0&lt;/li&gt;
+&lt;li&gt;À la lecture du caractère &lt;code&gt;"&lt;/code&gt; l'automate bascule dans l'état n°2&lt;/li&gt;
+&lt;li&gt;À la lecture des caractères &lt;code&gt;Susan&lt;/code&gt; l'automate boucle sur l'état n°2&lt;/li&gt;
+&lt;li&gt;À la lecture du caractère &lt;code&gt;"&lt;/code&gt; l'automate bascule dans l'état n°3&lt;/li&gt;
+&lt;li&gt;À la lecture du caractère &lt;code&gt;S&lt;/code&gt; l'automate bascule dans l'état &lt;code&gt;Invalid grammar&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Explication : la RFC 4180 stipule que les délimiteurs de texte (ici &lt;code&gt;"&lt;/code&gt;) compris dans les chaînes de caractères doivent être doublés pour éviter toute ambiguïté avec le délimiteur réel de fin de chaîne.&lt;/p&gt;
+&lt;h2&gt;Implémentation du graphe états-transitions en Python&lt;/h2&gt;
+&lt;p&gt;Le graphe d'états-transitions peut être implémenté simplement à l'aide d'une boucle et de quelques branchements conditionnels.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;is_valid&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;stream&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;sep&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;quotechar&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+    &lt;span class="sd"&gt;&amp;quot;&amp;quot;&amp;quot;Tells if a stream respects the CSV grammar.&lt;/span&gt;
+
+&lt;span class="sd"&gt;    Returns: tuple(bool, int)&lt;/span&gt;
+&lt;span class="sd"&gt;        - (bool) True if the stream is valid, False otherwise&lt;/span&gt;
+&lt;span class="sd"&gt;        - (int) Number of the line where the syntax error lays, 0 if no error&lt;/span&gt;
+&lt;span class="sd"&gt;    &amp;quot;&amp;quot;&amp;quot;&lt;/span&gt;
+
+    &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="n"&gt;quotechar&lt;/span&gt; &lt;span class="ow"&gt;is&lt;/span&gt; &lt;span class="bp"&gt;None&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+        &lt;span class="c1"&gt;# always True if the csv isn&amp;#39;t escaped&lt;/span&gt;
+        &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="bp"&gt;True&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+
+    &lt;span class="n"&gt;cur_state&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;
+
+    &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;i&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;line&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="nb"&gt;enumerate&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;stream&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+
+        &lt;span class="n"&gt;line&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;line&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;strip&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;&lt;/span&gt;&lt;span class="se"&gt;\r\n&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+        &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;char&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="n"&gt;line&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+
+            &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="n"&gt;cur_state&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+                &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="n"&gt;char&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="n"&gt;quotechar&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+                    &lt;span class="n"&gt;cur_state&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;2&lt;/span&gt;
+                &lt;span class="k"&gt;elif&lt;/span&gt; &lt;span class="n"&gt;char&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="n"&gt;sep&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+                    &lt;span class="k"&gt;pass&lt;/span&gt;
+                &lt;span class="k"&gt;else&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+                    &lt;span class="n"&gt;cur_state&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;
+
+            &lt;span class="k"&gt;elif&lt;/span&gt; &lt;span class="n"&gt;cur_state&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+                &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="n"&gt;char&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="n"&gt;sep&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+                    &lt;span class="n"&gt;cur_state&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;
+                &lt;span class="k"&gt;elif&lt;/span&gt; &lt;span class="n"&gt;char&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="n"&gt;quotechar&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+                    &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="bp"&gt;False&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;i&lt;/span&gt;&lt;span class="o"&gt;+&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="c1"&gt;# syntax error&lt;/span&gt;
+                &lt;span class="k"&gt;else&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+                    &lt;span class="k"&gt;pass&lt;/span&gt;
+
+            &lt;span class="k"&gt;elif&lt;/span&gt; &lt;span class="n"&gt;cur_state&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+                &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="n"&gt;char&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="n"&gt;quotechar&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+                    &lt;span class="n"&gt;cur_state&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;3&lt;/span&gt;
+                &lt;span class="k"&gt;else&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+                    &lt;span class="k"&gt;pass&lt;/span&gt;
+
+            &lt;span class="k"&gt;elif&lt;/span&gt; &lt;span class="n"&gt;cur_state&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="mi"&gt;3&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+                &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="n"&gt;char&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="n"&gt;quotechar&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+                    &lt;span class="n"&gt;cur_state&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;2&lt;/span&gt;
+                &lt;span class="k"&gt;elif&lt;/span&gt; &lt;span class="n"&gt;char&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="n"&gt;sep&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+                    &lt;span class="n"&gt;cur_state&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;
+                &lt;span class="k"&gt;else&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+                    &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="bp"&gt;False&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;i&lt;/span&gt;&lt;span class="o"&gt;+&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="c1"&gt;# syntax error&lt;/span&gt;
+
+        &lt;span class="c1"&gt;# end of the line reached&lt;/span&gt;
+        &lt;span class="c1"&gt;# equivalent of reaching \n character&lt;/span&gt;
+        &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="n"&gt;cur_state&lt;/span&gt; &lt;span class="o"&gt;!=&lt;/span&gt; &lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+            &lt;span class="n"&gt;cur_state&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;
+
+    &lt;span class="c1"&gt;# end of the stream reached&lt;/span&gt;
+    &lt;span class="c1"&gt;# equivalent of reaching EOF character&lt;/span&gt;
+    &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="n"&gt;cur_state&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+        &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="bp"&gt;False&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;i&lt;/span&gt;&lt;span class="o"&gt;+&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="c1"&gt;# syntax error&lt;/span&gt;
+    &lt;span class="k"&gt;else&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+        &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="bp"&gt;True&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;csv_1&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;700,&amp;quot;John Smith&amp;quot;,45&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+&lt;span class="n"&gt;csv_2&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;200,&amp;quot;Susan&amp;quot;Smith&amp;quot;,30&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+
+&lt;span class="n"&gt;is_valid&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;csv_1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;,&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;&amp;quot;&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="bp"&gt;True&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+
+&lt;span class="n"&gt;is_valid&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;csv_2&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;,&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;&amp;quot;&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="bp"&gt;False&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h2&gt;Bonus : Module Python&lt;/h2&gt;
+&lt;p&gt;Ce code est disponible sous-forme d'un module Python, accessible depuis ce repository git : &lt;a href="https://github.com/benjamindelmee/safe-csv"&gt;github.com/benjamindelmee/safe-csv&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Le module contient d'autres tests utiles aux data analystes comme par exemple :&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;test si chaque ligne possède le même nombre de colonnes&lt;/li&gt;
+&lt;li&gt;test si les noms de colonnes sont uniques&lt;/li&gt;
+&lt;li&gt;test si les headers ne contiennent pas de caractères spéciaux&lt;/li&gt;
+&lt;li&gt;...&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Le code est ouvert aux contributions.&lt;/p&gt;</content><category term="articles"></category></entry><entry><title>Transfert asynchrone de fichiers avec XMLHttpRequest et Flask</title><link href="https://datajourney.io/transfert-asynchrone-de-fichiers-avec-XMLHttpRequest-flask.html" rel="alternate"></link><published>2019-11-08T00:00:00+01:00</published><updated>2019-11-08T00:00:00+01:00</updated><author><name>Benjamin Delmée</name></author><id>tag:datajourney.io,2019-11-08:/transfert-asynchrone-de-fichiers-avec-XMLHttpRequest-flask.html</id><summary type="html">&lt;p&gt;Nous supposons intuitivement que les modifications apportées à notre profil utilisateur sont automatiquement enregistrées et qu'il n'est plus besoin de cliquer sur un bouton pour qu'elles soient prises en compte. Voyons comment les interfaces modernes utilisent les requêtes asynchrones pour parvenir à ce résultat, plus particulièrement pour le transfert de fichiers.&lt;/p&gt;</summary><content type="html">&lt;p&gt;Nous supposons intuitivement que les modifications apportées à notre profil utilisateur sont automatiquement enregistrées et qu'il n'est plus besoin de cliquer sur un bouton pour qu'elles soient prises en compte. Voyons comment les interfaces modernes utilisent les requêtes asynchrones pour parvenir à ce résultat, plus particulièrement pour le transfert de fichiers.&lt;/p&gt;
 &lt;h2&gt;Les objets XMLHttpRequest et FormData&lt;/h2&gt;
 &lt;p&gt;Commençons par illustrer le fonctionnement d'un formulaire écrit exclusivement en HTML.&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="p"&gt;&amp;lt;&lt;/span&gt;&lt;span class="nt"&gt;form&lt;/span&gt; &lt;span class="na"&gt;action&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;/upload&amp;quot;&lt;/span&gt; &lt;span class="na"&gt;method&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;POST&amp;quot;&lt;/span&gt; &lt;span class="na"&gt;enctype&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;multipart/form-data&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;&amp;gt;&lt;/span&gt;
