@@ -15,6 +15,9 @@
         body { background-color: #ECE1C5;}
         .title a {font-family: 'Bungee Shade', cursive; font-size: 1.2em; color: #292121; text-decoration: none;}
         .main-content { font-family: 'Source Sans Pro', sans-serif; }
+        .article_info { color: grey; font-style: italic; }
+        .article_info a { color: grey; }
+        .article_info a img { filter: grayscale(100%); -webkit-filter: grayscale(100%); }
     </style>
     
     <title>Écrire un parseur de fichiers CSV en Python</title>
@@ -46,7 +49,9 @@
             <article>
                 <header>
                     <h1 class="article-title">Écrire un parseur de fichiers CSV en Python</h1>
-<p style="color: grey; font-style: italic;">Par Benjamin Delmée le 10.11.2019 </p>                </header>
+<div class="article_info">
+    <p>Par <a href="https://www.linkedin.com/in/benjamindelmee/" target="_blank">Benjamin Delmée <img src="https://upload.wikimedia.org/wikipedia/commons/6/64/Icon_External_Link.png"></a> le 10.11.2019 </p>
+</div>                </header>
                 <p>Toutes les analyses de données commencent par la récupération des données nécessaires à la conduite de l'analyse. Elles sont souvent extraites de systèmes existants puis sont stockées sous forme de fichiers plats (généralement CSV). Malheureusement les fonctions d'export des systèmes ne respectent pas toujours les règles du format CSV ce qui engendre des problèmes lors de la phase d'ingestion ou d'analyse.</p>
 <p>Les anomalies les plus fréquentes sont :</p>
 <ul>

@@ -15,6 +15,9 @@
         body { background-color: #ECE1C5;}
         .title a {font-family: 'Bungee Shade', cursive; font-size: 1.2em; color: #292121; text-decoration: none;}
         .main-content { font-family: 'Source Sans Pro', sans-serif; }
+        .article_info { color: grey; font-style: italic; }
+        .article_info a { color: grey; }
+        .article_info a img { filter: grayscale(100%); -webkit-filter: grayscale(100%); }
     </style>
     
     <title>Les fonctions de fenêtrage en SQL</title>
@@ -46,7 +49,9 @@
             <article>
                 <header>
                     <h1 class="article-title">Les fonctions de fenêtrage en SQL</h1>
-<p style="color: grey; font-style: italic;">Par Benjamin Delmée le 23.10.2019 </p>                </header>
+<div class="article_info">
+    <p>Par <a href="https://www.linkedin.com/in/benjamindelmee/" target="_blank">Benjamin Delmée <img src="https://upload.wikimedia.org/wikipedia/commons/6/64/Icon_External_Link.png"></a> le 23.10.2019 </p>
+</div>                </header>
                 <p>En SQL, les <em>Window Functions</em> (fonctions de fenêtrage) sont plus efficaces et plus lisibles que du code équivalent sans window functions. Elles sont aussi simples à comprendre (voir davantage) que l'opérateur <code>GROUP BY</code> mais sont, pourtant, trop peu utilisées. Détaillons leur fonctionnement pour remédier à cela.</p>
 <p>À la manière du <code>GROUP BY</code>, les fonctions fenêtrées effectuent des calculs d'agrégations sur des paquets de lignes (qu'on appelle <strong>partitions</strong>). En revanche, une fois le calcul terminé, les lignes ne sont pas agrégées et le résultat du calcul est ajouté à toutes les lignes de la partition. Le nombre de lignes n'est donc pas modifié et le résultat de la requête contient autant de lignes que la table initiale.</p>
 <p>Le code et les schémas ci-dessous illustrent la différence entre <code>GROUP BY</code> et fonctions de fenêtrage.</p>

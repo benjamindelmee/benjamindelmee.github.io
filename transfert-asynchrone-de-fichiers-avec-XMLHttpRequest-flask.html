@@ -15,6 +15,9 @@
         body { background-color: #ECE1C5;}
         .title a {font-family: 'Bungee Shade', cursive; font-size: 1.2em; color: #292121; text-decoration: none;}
         .main-content { font-family: 'Source Sans Pro', sans-serif; }
+        .article_info { color: grey; font-style: italic; }
+        .article_info a { color: grey; }
+        .article_info a img { filter: grayscale(100%); -webkit-filter: grayscale(100%); }
     </style>
     
     <title>Transfert asynchrone de fichiers avec XMLHttpRequest et Flask</title>
@@ -46,7 +49,9 @@
             <article>
                 <header>
                     <h1 class="article-title">Transfert asynchrone de fichiers avec XMLHttpRequest et Flask</h1>
-<p style="color: grey; font-style: italic;">Par Benjamin Delmée le 08.11.2019 </p>                </header>
+<div class="article_info">
+    <p>Par <a href="https://www.linkedin.com/in/benjamindelmee/" target="_blank">Benjamin Delmée <img src="https://upload.wikimedia.org/wikipedia/commons/6/64/Icon_External_Link.png"></a> le 08.11.2019 </p>
+</div>                </header>
                 <p>Nous supposons intuitivement que les modifications apportées à notre profil utilisateur sont automatiquement enregistrées et qu'il n'est plus besoin de cliquer sur un bouton pour qu'elles soient prises en compte. Voyons comment les interfaces modernes utilisent les requêtes asynchrones pour parvenir à ce résultat, plus particulièrement pour le transfert de fichiers.</p>
 <h2>Les objets XMLHttpRequest et FormData</h2>
 <p>Commençons par illustrer le fonctionnement d'un formulaire écrit exclusivement en HTML.</p>

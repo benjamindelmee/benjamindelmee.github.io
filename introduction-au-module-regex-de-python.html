@@ -15,6 +15,9 @@
         body { background-color: #ECE1C5;}
         .title a {font-family: 'Bungee Shade', cursive; font-size: 1.2em; color: #292121; text-decoration: none;}
         .main-content { font-family: 'Source Sans Pro', sans-serif; }
+        .article_info { color: grey; font-style: italic; }
+        .article_info a { color: grey; }
+        .article_info a img { filter: grayscale(100%); -webkit-filter: grayscale(100%); }
     </style>
     
     <title>Introduction au module Regex de Python</title>
@@ -46,7 +49,9 @@
             <article>
                 <header>
                     <h1 class="article-title">Introduction au module Regex de Python</h1>
-<p style="color: grey; font-style: italic;">Par Benjamin Delmée le 27.10.2019 (mis à jour le 30.10.2019)</p>                </header>
+<div class="article_info">
+    <p>Par <a href="https://www.linkedin.com/in/benjamindelmee/" target="_blank">Benjamin Delmée <img src="https://upload.wikimedia.org/wikipedia/commons/6/64/Icon_External_Link.png"></a> le 27.10.2019 (mis à jour le 30.10.2019)</p>
+</div>                </header>
                 <p>Pour rappel, le terme <em>regex</em> provient de la contraction du terme <em>regular expression</em> (<em>expression régulière</em> en français). Formellement, les expressions régulières permettent de décrire les grammaires régulières. Il existe plusieurs autres types de grammaires (algébriques, contextuelles et générales) et sont décrites dans la hiérarchie de Chomsky.</p>
 <p>Cependant les grammaires régulières sont généralement suffisantes pour effectuer des tâches de traitement de texte simples telles que la validation automatique de saisie ou encore du data cleaning.</p>
 <p>Par exemple, on peut vérifier si un numéro de téléphone est correctement formé en testant s'il correspond à la grammaire suivante : "5 paires de chiffres, éventuellement séparées par un espace".</p>
