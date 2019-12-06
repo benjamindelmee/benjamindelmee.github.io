@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="fr">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Bungee+Shade|Source+Sans+Pro&display=swap" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <style>
+        body { background-color: #ECE1C5;}
+        .title a {font-family: 'Bungee Shade', cursive; font-size: 1.2em; color: #292121; text-decoration: none;}
+        .main-content { font-family: 'Source Sans Pro', sans-serif; }
+        .article_info { color: grey; font-style: italic; }
+        .article_info a { color: grey; }
+        .article_info a img { filter: grayscale(100%); -webkit-filter: grayscale(100%); }
+    </style>
+    
+    <title>Tests utilsateurs : la différence entre « Utilisabilité » et « Motivation »</title>
+
+    <!-- Hotjar Tracking Code for datajourney.io -->
+    <script>
+        (function(h,o,t,j,a,r){
+            h.hj=h.hj||function(){(h.hj.q=h.hj.q||[]).push(arguments)};
+            h._hjSettings={hjid:1593050,hjsv:6};
+            a=o.getElementsByTagName('head')[0];
+            r=o.createElement('script');r.async=1;
+            r.src=t+h._hjSettings.hjid+j+h._hjSettings.hjsv;
+            a.appendChild(r);
+        })(window,document,'https://static.hotjar.com/c/hotjar-','.js?sv=');
+    </script>
+
+<link rel="stylesheet" type="text/css" href="https://datajourney.io/theme/css/pygment.css" />
+<style>
+    .highlight pre { padding: 5px; border-radius: 2px; color: #d0d0d0; }
+    .main-content img { max-width: 100%; height: auto; }
+    .foot-nav { color: #292121; text-decoration: none; }
+    table { border-collapse: collapse; width: 100%; margin-bottom: 20px; margin-top: 20px;}
+    table th, td { border:1px solid #292121; padding: 3px; }
+    table th { background: #d9ceb2; }
+</style>
+</head>
+<body>
+    
+    <div class="container main-header">
+        <header class="text-center mb-5 mt-5">
+            <h1 class="title"><a href="https://datajourney.io/">Data Journey</a></h1>
+            <p class="lead">#Data #Programmation</p>
+        </header>
+    </div>
+    
+    <div class="container main-content">
+<section>
+    <div class="row">
+        <div class="col"></div>
+        <div class="col-sm-12 col-md-10 col-lg-8">
+            <article>
+                <header>
+                    <h1 class="article-title">Tests utilsateurs : la différence entre «&nbsp;Utilisabilité&nbsp;» et «&nbsp;Motivation&nbsp;»</h1>
+<div class="article_info">
+    <p>Par <a href="https://www.linkedin.com/in/benjamindelmee/" target="_blank">Benjamin Delmée <img src="https://upload.wikimedia.org/wikipedia/commons/6/64/Icon_External_Link.png"></a> le 06.12.2019 </p>
+</div>                </header>
+                <p>Lors de son cycle de développement, une solution applicative sera soumise à divers tests afin de vérifier si elle satisfait des critères techniques et si elle répond aux attentes métiers. Cet article porte sur les tests d'«&nbsp;Utilisabilité&nbsp;» et de «&nbsp;Motivation&nbsp;», deux types de tests différents et parfois confondus car évaluant deux notions corrélées mais distinctes.</p>
+<h2>La relation entre Utilisabilité et Motivation</h2>
+<p>Commençons par définir ces deux notions.</p>
+<ul>
+<li>
+<p><strong>La « Motivation », c'est la volonté qu'a un individu a d'utiliser la solution.</strong> Cette volonté est générée par des besoins extérieurs à la solution (ceux auxquelles cette dernière répond). Par exemple, les utilisateurs de la plateforme de déclaration des revenus en ligne sont fortement motivés à utiliser cette solution. En effet, s'ils ne le font pas ils risquent une majoration de leur imposition. À l'inverse, imaginez que l'on propose aux clients d'un magasin d'installer une application sur leurs téléphones en échange d'une remise en caisse de 10 centimes. Ces derniers seront très peu motivés à adopter la solution.</p>
+</li>
+<li>
+<p><strong>« L'utilisabilité » c'est l'aisance avec laquelle les individus comprennent et utilisent la solution.</strong> Par exemple, s'il suffit d'une minute pour déclarer ses impôts en ligne, alors l'utilisabilité de la solution est forte. À l'inverse, si après plusieurs minutes de navigation les utilisateurs ne parviennent pas à déclarer en ligne, alors c'est que l'utilisabilité de la solution est faible.</p>
+</li>
+</ul>
+<p>Ces deux notions sont strictement distinctes. En effet la Motivation est une <strong>propriété des individus</strong> liée à leurs besoins initiaux alors que l'utilisabilité est une <strong>propriété de la solution</strong> liée à la qualité de sa conception.</p>
+<p>Examinons maintenant le graphique ci-dessous.</p>
+<p><img alt="Courbe de Fogg" src="https://datajourney.io/images/006_fogg-curve.png"></p>
+<p>Ce graphique (<a href="https://www.alexandercowan.com/stop-showing-people-your-prototypes/">extrait du blog d'Alexander Cowan</a>) qui illustre le modèle comportemental de <a href="https://en.wikipedia.org/wiki/B._J._Fogg">B.J. Fogg</a> nous apprend que la Motivation et la l'Utilisabilité sont deux critères importants pour qu'un individu "passe à l'action", c'est-à-dire qu'il devienne un utilisateur de la solution. Si les deux critères ne sont pas réunis alors l'individu se placera dans la zone "d'inaction", c'est-à-dire la zone des non-utilisateurs.</p>
+<p>Ce graphique montre également que, dans une certaine mesure, les critères de Motivation et d'Utilisabilité se compensent. Une diminution de la Motivation peut être compensée par une augmentation de l'Utilisabilité et vice-versa. Attention cependant car cette compensation n'est pas linéaire. Une légère perte chez l'un doit être compensée par une forte hausse chez l'autre. En effet, on imagine mal qu'une solution sans d'intérêt soit massivement utilisée simplement car elle serait très simple à manipuler.</p>
+<p>Examinons maintenant comment évaluer une solution sur les critères de Motiviation et d'Utilisabilité.</p>
+<h2>Comment tester la « Motivation ?</h2>
+<p>Un test de Motivation permet de répondre à la question "Les individus désirent-ils utiliser mon application ?". Chronologiquement ce test est effectué avant le lancement d'un projet. Idéalement, en conditionnant le démarrage des projets au succès d'un test de Motivation, on réduirait le taux de projets abandonnés pour cause de manque d'intérêt du public ciblé.</p>
+<p>Pour savoir si une solution sera adoptée par ses utilisateurs cibles avant même d'avoir été développée, on peut réaliser une expérimentation qu'on appelle un <a href="https://en.wikipedia.org/wiki/Minimum_viable_product">MVP</a> Sales. Sans jargon, cela revient ici à proposer au téléchargement la solution alors qu'elle n'est pas encore développée afin de mesurer l'intérêt de public.</p>
+<p>Le protocole est le suivant :</p>
+<ol>
+<li>Un support de communication (landing page, email, flyer, etc.) est transmis aux utilisateurs potentiels de la future solution. Les bénéfices de la solution y sont vantés et les individus ciblés sont invités à la télécharger.</li>
+<li>Une période de temps s'écoule pendant laquelle certains individus essaieront de télécharger l'application (à ce moment-là, ils seront informés que la solution n'est pas encore disponible au téléchargement).</li>
+<li>À la fin de la période, la mesure du ratio [tentatives de téléchargement / nombre de personnes contactées] permet d'approximer l'adhérence de la population cible et de décider si la solution mérite d'être développée.</li>
+</ol>
+<h2>Comment tester l'« Utilisabilité » ?</h2>
+<p>Un test d'utilisabilité permet de répondre à la question "Avec quelle aisance les utilisateurs comprennent-ils le fonctionnement de ma solution ?". Chronologiquement, ce test arrive après le test de motiviation.</p>
+<p>Il se déroule de la manière suivante :</p>
+<ol>
+<li>On place un individu en face de la solution (ou du prototype).</li>
+<li>On lui demande d'effectuer des tâches précises. Par exemple, dans le cas fictif où l'on développerait une application de gestion de factures, on pourrait demander à l'utilisateur d'éditer la date d'une facture enregistrée.</li>
+<li>On observe l'aisance qu'a l'individu à effectuer les tâches demandées. On note les étapes où il échoue et les raisons.</li>
+</ol>
+<p>Ce protocole permet d'identifier les points de friction de l'interface, c'est-à-dire les situations où l'utilisateur manque de repères pour réaliser une tâche. On peut alors corriger le design de la solution pour supprimer cette friction et améliorer l'utilisabilité.</p>
+<p>Voici quelques exemples de problèmes d'utilisabilité qui peuvent être détectés :</p>
+<ul>
+<li>Une fonctionnalité introuvable car accessible seulement après avoir navigué sur plusieurs pages.</li>
+<li>Un champ de saisie de numéro de téléphone qui n'accepte que les numéros au format français (10 chiffres), ce qui empêche tous les potentiels utilisateurs étrangers de s'inscrire.</li>
+<li>Une interface qui ne réagit pas aux interactions de l'utilisateur, lui laissant supposer que ses actions ne sont pas prises en compte.</li>
+</ul>
+<h2>À retenir</h2>
+<ul>
+<li>Motivation et Utilisabilité sont des caractéristiques distinctes et nécessaires à l'adoption d'une solution.</li>
+<li>Elles peuvent se compenser, mais faiblement.</li>
+<li>Elles peuvent (et doivent) être testées séparément.</li>
+</ul>
+            </article>
+        </div>
+        <div class="col"></div>
+    </div>
+</section>
+
+<!-- footer -->
+<div class="row mb-5">
+    <div class="col"></div>
+    <div class="col-sm-12 col-md-10 col-lg-8">
+        <hr>
+        <div class="row">
+            <div class="col">
+                <a href="https://datajourney.io" class="foot-nav">&larr; Page d'acceuil</a>
+            </div>
+            <div class="col text-right">
+                <a href="#top" class="foot-nav">&uarr; Haut de la page</a>
+            </div>
+        </div>
+    </div>
+    <div class="col"></div>
+</div>
+    </div>
+
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-150831892-1"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'UA-150831892-1');
+    </script>
+
+    
+</body>
+</html>
