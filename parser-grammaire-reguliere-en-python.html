@@ -20,7 +20,7 @@
         .article_info a img { filter: grayscale(100%); -webkit-filter: grayscale(100%); }
     </style>
     
-    <title>Écrire un parseur de fichiers CSV en Python</title>
+    <title>Parser une grammaire régulière en Python</title>
 
     <!-- Hotjar Tracking Code for https://datajourney.io -->
     <script>
@@ -60,9 +60,9 @@
         <div class="col-sm-12 col-md-10 col-lg-8">
             <article>
                 <header>
-                    <h1 class="article-title">Écrire un parseur de fichiers CSV en Python</h1>
+                    <h1 class="article-title">Parser une grammaire régulière en Python</h1>
 <div class="article_info">
-    <p>Par <a href="https://www.linkedin.com/in/benjamindelmee/" target="_blank">Benjamin Delmée <img src="https://upload.wikimedia.org/wikipedia/commons/6/64/Icon_External_Link.png"></a> le 10.11.2019 </p>
+    <p>Par <a href="https://www.linkedin.com/in/benjamindelmee/" target="_blank">Benjamin Delmée <img src="https://upload.wikimedia.org/wikipedia/commons/6/64/Icon_External_Link.png"></a> le 10.11.2019 (mis à jour le 06.12.2019)</p>
 </div>                </header>
                 <p>Toutes les analyses de données commencent par la récupération des données nécessaires à la conduite de l'analyse. Elles sont souvent extraites de systèmes existants puis sont stockées sous forme de fichiers plats (généralement CSV). Malheureusement les fonctions d'export des systèmes ne respectent pas toujours les règles du format CSV ce qui engendre des problèmes lors de la phase d'ingestion ou d'analyse.</p>
 <p>Les anomalies les plus fréquentes sont :</p>
@@ -73,7 +73,7 @@
 <p>Ces erreurs sont parfois difficiles à corriger. Plus grave encore, elles ne sont parfois pas détectées car les outils de data ingestion (comme Pandas) sont par défaut très tolérants et construisent des tables avec un nombre erroné de colonnes ou de lignes.</p>
 <p>Fort heureusement on peut écrire un parseur de CSV qui vérifie automatiquement la conformité d'un fichier et nous donner la garantie que nos sources sont fiables ou nous aider à trouver les erreurs lorsqu'il y en a.</p>
 <h2>Représentation de la grammaire d'un fichier CSV via un graphe d'états-transitions</h2>
-<p>La grammaire d'un fichier CSV est décrite dans la <a href="https://tools.ietf.org/html/rfc4180">RFC 4180</a>. Elle est de type régulière, donc descriptible par un automate fini et déterministe :</p>
+<p>La grammaire d'un fichier CSV est décrite dans la <a href="https://tools.ietf.org/html/rfc4180">RFC 4180</a>. Elle est de type régulière, donc descriptible par un automate fini et déterministe (une version simplifiée d'une machine de Turing) :</p>
 <p><img alt="Automate fini et déterministe de la grammaire d'un CSV" src="https://datajourney.io/images/005_grammar_csv.png"></p>
 <p>Ce graphe d'états-transitions fonctionne de la manière suivante : les caractères du fichier CSV sont lus un par un. À chaque lecture d'un nouveau caractère l'état courant est mis à jour en fonction de la règle de transition. Dans le cas où le fichier CSV est conforme à la RFC 4180, l'état final (c'est-à-dire l'état courant après la lecture du dernier caractère du fichier) sera l'état <code>Valid Grammar</code>.</p>
 <p>Voici un exemple avec une ligne de fichier CSV non conforme :</p>
