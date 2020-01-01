@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="fr">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Bungee+Shade|Source+Sans+Pro&display=swap" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <style>
+        body { background-color: #ECE1C5;}
+        .title a {font-family: 'Bungee Shade', cursive; font-size: 1.2em; color: #292121; text-decoration: none;}
+        .main-content { font-family: 'Source Sans Pro', sans-serif; }
+        .article_info { color: grey; font-style: italic; }
+        .article_info a { color: grey; }
+        .article_info a img { filter: grayscale(100%); -webkit-filter: grayscale(100%); }
+    </style>
+    
+    <title>Tableau Software : Workout Wednesday n°48 (2019)</title>
+
+    <!-- Hotjar Tracking Code for https://datajourney.io -->
+    <script>
+        (function(h,o,t,j,a,r){
+            h.hj=h.hj||function(){(h.hj.q=h.hj.q||[]).push(arguments)};
+            h._hjSettings={hjid:1602265,hjsv:6};
+            a=o.getElementsByTagName('head')[0];
+            r=o.createElement('script');r.async=1;
+            r.src=t+h._hjSettings.hjid+j+h._hjSettings.hjsv;
+            a.appendChild(r);
+        })(window,document,'https://static.hotjar.com/c/hotjar-','.js?sv=');
+    </script>
+
+<link rel="stylesheet" type="text/css" href="https://datajourney.io/theme/css/pygment.css" />
+<style>
+    .highlight pre { padding: 5px; border-radius: 2px; color: #d0d0d0; }
+    .main-content img { max-width: 100%; height: auto; }
+    .foot-nav { color: #292121; text-decoration: none; }
+    table { border-collapse: collapse; width: 100%; margin-bottom: 20px; margin-top: 20px;}
+    table th, td { border:1px solid #292121; padding: 3px; }
+    table th { background: #d9ceb2; }
+</style>
+</head>
+<body>
+    
+    <div class="container main-header">
+        <header class="text-center mb-5 mt-5">
+            <h1 class="title"><a href="https://datajourney.io/">Data Journey</a></h1>
+            <p class="lead">#Data #Programmation</p>
+        </header>
+    </div>
+    
+    <div class="container main-content">
+<section>
+    <div class="row">
+        <div class="col"></div>
+        <div class="col-sm-12 col-md-10 col-lg-8">
+            <article>
+                <header>
+                    <h1 class="article-title">Tableau Software : Workout Wednesday n°48 (2019)</h1>
+<div class="article_info">
+    <p>Par <a href="https://www.linkedin.com/in/benjamindelmee/" target="_blank">Benjamin Delmée <img src="https://upload.wikimedia.org/wikipedia/commons/6/64/Icon_External_Link.png"></a> le 01.01.2020 </p>
+</div>                </header>
+                <p>Cet article est inspiré par le <a href="http://www.workout-wednesday.com/week-48-can-you-build-a-bar-chart-that-automatically-combines-small-contributions/">défi de la semaine n°48 (2019) de Workout Wednesday</a>. Les notions de <em>Parameter</em>, <em>Dynamic Set</em> et <em>LOD Expressions</em> sont abordées.</p>
+<p>workout-wednesday.com propose chaque semaine un défi de data visualisation à relever. Les niveaux sont variés et les solutions sont mises à disposition, ce qui en fait une très bonne ressource d'apprentissage et de perfectionnement.</p>
+<p>Le défi traité dans cet article consiste à recréer un <em>bar chart</em> avec agrégation automatique des petites valeurs dans une catégorie "autres". C'est un exercice assez simple mais qui requière de connaitre et de combiner plusieurs fonctionnalités de Tableau.</p>
+<p>Voici le résultat que nous voulons obtenir :</p>
+<p><img alt="Dynamic Bar Chart" src="https://datajourney.io/images/007_tableau_dynamic_barchart.gif"></p>
+<p>Ce graphique utilise la source de données <em>superstore 2019.12</em> mise à disposition par Tableau. Chaque barre représente les ventes (<code>Sales</code>) d'un pays (<code>State</code>) raportées aux ventes totales. Les pays minoritaires (avec un taux de contribution inférieur au paramètre <code>Aggregation Level</code>) sont regroupés sous le nom <code>"Other States"</code>.</p>
+<p>Voyons maintenant pas-à-pas comment atteindre ce résultat.</p>
+<h2>Étape n°1 : LOD Expression</h2>
+<p>La première étape consiste à calculer pour chaque pays son taux de contribution aux ventes globales.</p>
+<div class="highlight"><pre><span></span>taux de contribution du pays X = (ventes dans le pays X) / (ventes mondiales)
+</pre></div>
+
+
+<p>Un moyen simple et rapide d'obtenir ce résultat est d'appliquer sur le champ <code>Sales</code> l'opération <em>% of Total</em> du menu <em>Quick Table Calculation</em>. Malheureusement les calculs de table ne sont pas utilisables dans les champs calculés (ce dont nous aurons besoin par la suite), nous allons donc créer un champ calculé nommé <code>% of total</code> en utilisant la formule suivante :</p>
+<p><img alt="LOD Expression" src="https://datajourney.io/images/007_tableau_LOD_expression.png"></p>
+<p>Ceci est une <em>LOD expression</em>. On la reconnait à la présence des crochets autours de l'agrégation <code>{SUM([Sales])}</code>.</p>
+<blockquote>
+<p>&laquo; <em>Les expressions LOD vous permettent de déterminer les niveaux de détail (c'est-à-dire les dimensions) utilisés dans un calcul, sans devoir les placer dans votre visualisation. Vous pouvez définir le niveau de détail auquel le calcul sera exécuté, indépendamment du niveau de détail de votre visualisation.</em> &raquo;</p>
+</blockquote>
+<p>On peut définir le niveau de détail d'un champ calculé en l'encadrant avec des crochets et, optionnellement, en ajoutant l'un des mots-clés  <code>FIXED</code>, <code>INCLUDE</code> ou <code>EXCLUDE</code>. Dans le cas où aucun mot-clé n'est spécifié, le comportement par défaut est d'effectuer le calcul d'agrégation en utilisant la table entière comme partition.</p>
+<p>Dans notre exemple, l'expression <code>{SUM([Sales])}</code> renvoie la somme totale des ventes, tous pays confondus. À noter qu'elle renvoie une valeur par ligne et n'est donc pas considérée comme une agrégation. C'est pourquoi il est nécessaire d'utiliser la fonction <code>MAX</code> pour transformer le résultat en agrégation.</p>
+<p>On peut vérifier que le résultat est identique à celui obtenu avec l'opération <em>% of Total</em> du menu <em>Quick Table Calculation</em> :</p>
+<p><img alt="LOD Expression" src="https://datajourney.io/images/007_tableau_table_calculation.png"></p>
+<h2>Étape n°2 : Paramètre</h2>
+<p>Afin de fixer le seuil de contribution aux ventes en dessous duquel les pays devront être agrégés dans la catégorie <code>Other States</code>, on créer un paramètre nommé <code>Aggregation Level</code> qui permettra à l'utilisateur de choisir le niveau d'agrégation désiré.</p>
+<p><img alt="LOD Expression" src="https://datajourney.io/images/007_tableau_parameter.png"></p>
+<p>Le type du paramètre, son affichage et sa plage de valeur sont simples à déterminer puisqu'il s'agit d'un pourcentage. Une fois le paramètre créé, on peut l'afficher dans la visualisation (clique droit sur le paramètre puis <em>Show Parameter Control</em>). Un slider apparaîtra et l'utilisateur pourra ainsi modifier la valeur du paramètre.</p>
+<p><img alt="Parameter" src="https://datajourney.io/images/007_tableau_show_parameter_control.png"></p>
+<h2>Étape n°3 : Ensemble dynamique</h2>
+<p>Nous allons créer un ensemble dynamique pour distinguer les pays minoritaires (avec une participation inférieure au seuil <code>Aggregation Level</code>). Un ensemble dynamique sépare le jeu de données en deux sous-ensembles <code>IN</code> et <code>OUT</code> sur la base d'une formule booléenne.</p>
+<p>En plus de séparer le jeu de données en deux, les ensembles ont d'autres avantages :</p>
+<ul>
+<li>Ils standardisent la notion d'ensemble dans Tableau. Tout comme en programmation, utiliser des fonctions standard permet de rendre son travail rapidement compréhensible par n'importe quel autre utilisateur. Il est donc préférable de les utiliser par défaut et de s'en écarter uniquement en cas de besoin très spécifique.</li>
+<li>Ils donnent accès aux opérations ensemblistes telles que l'union, l'intersection et l'exclusion.</li>
+</ul>
+<p>Les ensembles peuvent être définis de plusieurs manières :</p>
+<ul>
+<li>Les ensembles fixes :<ul>
+<li>Directement en sélectionnant depuis la visualisation les points à ajouter à l'ensemble.</li>
+<li>Pour une dimension donnée, en sélectionnant la liste des valeurs qui doivent être ajoutées à l'ensemble.</li>
+</ul>
+</li>
+<li>Les ensembles dynamiques :<ul>
+<li>Pour une dimension donnée, avec une condition ou une formule. Cette méthode est de loin la plus puissante des trois et permet de développer des analyses complexes.</li>
+</ul>
+</li>
+</ul>
+<p>Pour notre exemple, créons un ensemble dynamique nommé <code>Biggest States Set</code> en utilisant la formule suivante :</p>
+<p><img alt="Create set with formula" src="https://datajourney.io/images/007_tableau_create_set_with_formula.png"></p>
+<p>On retrouve le champ calculé <code>[% of total]</code> que nous avons défini précédemment ainsi que le paramètre <code>Aggregation Level</code>.</p>
+<p>Chaque fois que l'utilisateur modifiera la valeur du paramètre <code>Aggregation Level</code>, l'ensemble sera recalculé. Si l'utilisateur augmente le seuil, les pays qui passent sous le seuil seront ajoutés à l'ensemble. À l'inverse si l'utilisateur diminue la valeur du seuil, les pays qui repassent au-dessus du seuil seront retirés de l'ensemble.</p>
+<h2>Étape n°4 : Agréger les pays minoritaires</h2>
+<p>Créons un champ calculé qui conserve le nom du pays si ce dernier est dans l'ensemble <code>Biggest States Set</code> et qui sinon le remplace par la valeur <code>"Other State"</code>.</p>
+<p><img alt="Agregate states using a calculated field" src="https://datajourney.io/images/007_tableau_calculated_field.png"></p>
+<h2>Étape finale</h2>
+<p>Nous disposons maintenant de toutes les pièces du puzzle pour réussir ce défi. Il ne reste plus qu'à agencer correctement nos champs dans la zone de visualisation afin d'obtenir le résultat final :</p>
+<p><img alt="Expected result" src="https://datajourney.io/images/007_tableau_final_sheet.png"></p>
+<ul>
+<li>Placez en ligne le champ <code>Biggest States</code>.</li>
+<li>Placez en colonne le champ <code>Sales</code> et appliquez l'opération <em>% of Total</em> du menu <em>Quick Table Calculation</em>.</li>
+<li>Utilisez le champ <code>Biggest States Set</code> colorier les pays en fonction qu'ils soient inclus ou non dans l'ensemble.</li>
+<li>Créez une ligne de référence qui prend la valeur du paramètre <code>Aggregation Level</code>.</li>
+<li>Triez les lignes en fonction d'un champ <code>Sales Biggest States</code> (que vous devrez créer en utilisant la formule suivante : <code>IIF([Biggest States Set], [Sales], 0)</code>).</li>
+</ul>
+<h2>À retenir</h2>
+<p>Les notions importantes traitées dans cette article :</p>
+<ul>
+<li>LOD Expressions</li>
+<li>Parameters</li>
+<li>Dynamic sets</li>
+</ul>
+            </article>
+        </div>
+        <div class="col"></div>
+    </div>
+</section>
+
+<!-- footer -->
+<div class="row mb-5">
+    <div class="col"></div>
+    <div class="col-sm-12 col-md-10 col-lg-8">
+        <hr>
+        <div class="row">
+            <div class="col">
+                <a href="https://datajourney.io" class="foot-nav">&larr; Page d'acceuil</a>
+            </div>
+            <div class="col text-right">
+                <a href="#top" class="foot-nav">&uarr; Haut de la page</a>
+            </div>
+        </div>
+    </div>
+    <div class="col"></div>
+</div>
+    </div>
+
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-150831892-1"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'UA-150831892-1');
+    </script>
+
+    
+</body>
+</html>
